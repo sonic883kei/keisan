@@ -70,71 +70,169 @@
                     </div>
                 </div>
 
-                <button id="btn-start" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-lg rounded-xl shadow-lg shadow-indigo-950 transition-all duration-150 transform active:scale-98 flex items-center justify-center space-x-2 border border-indigo-500">
-                    <span>テストを開始する</span>
-                    <i class="fa-solid fa-play"></i>
+                <div class="w-full space-y-3">
+                    <button id="btn-start" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-lg rounded-xl shadow-lg shadow-indigo-950 transition-all duration-150 transform active:scale-98 flex items-center justify-center space-x-2 border border-indigo-500">
+                        <span>テストを開始する (全20問)</span>
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button id="btn-category-select" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold text-base rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 border border-slate-700">
+                        <i class="fa-solid fa-list-check text-amber-400"></i>
+                        <span>単元別に練習する</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category Select Screen -->
+            <div id="screen-category" class="hidden p-6 md:p-8 flex flex-col justify-between my-auto space-y-6">
+                <div class="text-center space-y-2">
+                    <div class="inline-block p-3 bg-indigo-950 text-indigo-400 rounded-full text-2xl mb-1 border border-indigo-800">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <h2 class="text-xl md:text-2xl font-extrabold text-slate-100">単元別トレーニング</h2>
+                    <p class="text-slate-400 text-xs">集中して練習したい単元をえらんでください</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="arithmetic">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
+                                <i class="fa-solid fa-calculator"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-200 text-base">四則演算</div>
+                                <div class="text-slate-400 text-xs font-normal">2〜3桁の足し算・引き算・掛け算・割り算</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                    </button>
+
+                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="prime">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
+                                <i class="fa-solid fa-network-wired"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-200 text-base">素因数分解</div>
+                                <div class="text-slate-400 text-xs font-normal">2〜13の素数を使った因数分解練習</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                    </button>
+
+                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="fraction_compare">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
+                                <i class="fa-solid fa-scale-balanced"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-200 text-base">分数の大小比較</div>
+                                <div class="text-slate-400 text-xs font-normal">わずかな差の分数を不等号で比較</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                    </button>
+
+                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="ratio">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
+                                <i class="fa-solid fa-percent"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-200 text-base">割合計算</div>
+                                <div class="text-slate-400 text-xs font-normal">割増・割引・もとにする量の計算</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                    </button>
+
+                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="time_notation">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
+                                <i class="fa-regular fa-clock"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-200 text-base">時間の表記</div>
+                                <div class="text-slate-400 text-xs font-normal">時間と分の相互変換（分数入力）</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                    </button>
+
+                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="speed_unit">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
+                                <i class="fa-solid fa-gauge-high"></i>
+                            </div>
+                            <div>
+                                <div class="text-slate-200 text-base">単位変換</div>
+                                <div class="text-slate-400 text-xs font-normal">時速・秒速・分速の単位変換</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                    </button>
+                </div>
+
+                <button id="btn-back-to-start" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm rounded-xl border border-slate-700 transition-all">
+                    <i class="fa-solid fa-arrow-left mr-2"></i>メニューに戻る
                 </button>
             </div>
 
             <!-- Quiz Screen -->
             <div id="screen-quiz" class="hidden flex-col justify-between h-full p-4 md:p-6">
-                <!-- Top Progress Bar -->
+                <!-- Top Badge Header (Progress Bar Removed) -->
                 <div>
                     <div class="flex justify-between items-center text-sm font-semibold text-slate-400 mb-2">
-                        <span id="question-number-badge" class="bg-indigo-950 text-indigo-300 border border-indigo-800/60 px-3 py-1 rounded-full text-xs font-bold">問 1 / 20</span>
+                        <span id="question-number-badge" class="bg-indigo-950 text-indigo-300 border border-indigo-800/60 px-3.5 py-1.5 rounded-full text-xs font-bold">問 1 / 20</span>
                         <span id="question-category" class="text-slate-400 text-xs">四則演算</span>
-                    </div>
-                    <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                        <div id="progress-bar" class="bg-indigo-500 h-full w-1/20 transition-all duration-300"></div>
                     </div>
                 </div>
 
                 <!-- Problem Card Display -->
-                <div class="my-6 py-6 px-4 bg-slate-800/70 border border-slate-700/60 rounded-2xl flex flex-col items-center justify-center min-h-[140px] text-center relative shadow-inner">
+                <div class="my-4 py-6 px-4 bg-slate-800/70 border border-slate-700/60 rounded-2xl flex flex-col items-center justify-center min-h-[140px] text-center relative shadow-inner">
                     <span class="absolute top-2 left-3 text-xs font-bold text-slate-400" id="q-label">Q1</span>
                     <div id="problem-statement" class="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-wider">
                         <!-- Problem text inserted dynamically -->
                     </div>
                     <!-- Current Input Preview Area -->
-                    <div id="input-preview-box" class="mt-4 min-h-[48px] flex items-center justify-center text-indigo-300 font-bold text-xl md:text-2xl bg-slate-900 px-6 py-2 rounded-xl border-2 border-indigo-900/80 shadow-sm w-full max-w-xs">
+                    <div id="input-preview-box" class="mt-4 min-h-[52px] flex items-center justify-center text-indigo-300 font-bold text-xl md:text-2xl bg-slate-900 px-6 py-2.5 rounded-xl border-2 border-indigo-900/80 shadow-sm w-full max-w-xs">
                         <span id="input-preview-text" class="placeholder-text text-slate-500 font-normal text-base">解答を入力してください</span>
                     </div>
                 </div>
 
-                <!-- Dynamic Keypads -->
+                <!-- Dynamic Keypads (Enlarged with wider gaps) -->
                 <div id="keypad-container" class="w-full">
                     
                     <!-- 1. Numeric Keypad (Standard) -->
-                    <div id="keypad-numeric" class="grid grid-cols-3 gap-2 max-w-xs mx-auto">
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-3.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('7')">7</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-3.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('8')">8</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-3.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('9')">9</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-3.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('4')">4</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-3.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('5')">5</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-3.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('6')">6</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-3.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('1')">1</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-3.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('2')">2</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-3.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('3')">3</button>
-                        <button class="key-btn bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 font-bold text-lg py-3.5 rounded-xl border border-amber-800/60 shadow-sm" onclick="app.clearInput()">C</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-3.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('0')">0</button>
-                        <button class="key-btn bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-2xl py-3.5 rounded-xl shadow-md flex items-center justify-center border border-emerald-500" onclick="app.submitAnswer()">
+                    <div id="keypad-numeric" class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('7')">7</button>
+                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('8')">8</button>
+                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('9')">9</button>
+                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('4')">4</button>
+                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('5')">5</button>
+                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('6')">6</button>
+                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('1')">1</button>
+                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('2')">2</button>
+                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('3')">3</button>
+                        <button class="key-btn bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 font-bold text-lg py-4 rounded-xl border border-amber-800/60 shadow-sm" onclick="app.clearInput()">C</button>
+                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('0')">0</button>
+                        <button class="key-btn bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-2xl py-4 rounded-xl shadow-md flex items-center justify-center border border-emerald-500" onclick="app.submitAnswer()">
                             <i class="fa-solid fa-check"></i>
                         </button>
                     </div>
 
                     <!-- 2. Prime Factors Keypad (Q10) -->
                     <div id="keypad-prime" class="hidden max-w-sm mx-auto space-y-3">
-                        <div class="grid grid-cols-3 gap-2">
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(2)">2</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(3)">3</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(5)">5</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(7)">7</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(11)">11</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(13)">13</button>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(2)">2</button>
+                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(3)">3</button>
+                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(5)">5</button>
+                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(7)">7</button>
+                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(11)">11</button>
+                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(13)">13</button>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button class="key-btn bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 font-bold text-base py-3 rounded-xl border border-amber-800/60 shadow-sm" onclick="app.clearInput()">1文字消す</button>
-                            <button class="key-btn bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xl py-3 rounded-xl shadow-md flex items-center justify-center space-x-1 border border-emerald-500" onclick="app.submitAnswer()">
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="key-btn bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 font-bold text-base py-3.5 rounded-xl border border-amber-800/60 shadow-sm" onclick="app.clearInput()">1文字消す</button>
+                            <button class="key-btn bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xl py-3.5 rounded-xl shadow-md flex items-center justify-center space-x-1 border border-emerald-500" onclick="app.submitAnswer()">
                                 <span>確定</span>
                                 <i class="fa-solid fa-check"></i>
                             </button>
@@ -143,12 +241,12 @@
 
                     <!-- 3. Inequality Keypad (Q11, Q12) -->
                     <div id="keypad-inequality" class="hidden max-w-xs mx-auto space-y-3">
-                        <div class="grid grid-cols-3 gap-2">
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-3xl py-5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.selectInequality('<')">&lt;</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-3xl py-5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.selectInequality('=')">=</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-3xl py-5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.selectInequality('>')">&gt;</button>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-3xl py-6 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.selectInequality('<')">&lt;</button>
+                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-3xl py-6 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.selectInequality('=')">=</button>
+                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-3xl py-6 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.selectInequality('>')">&gt;</button>
                         </div>
-                        <button class="key-btn w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xl py-3 rounded-xl shadow-md flex items-center justify-center space-x-1 border border-emerald-500" onclick="app.submitAnswer()">
+                        <button class="key-btn w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xl py-3.5 rounded-xl shadow-md flex items-center justify-center space-x-1 border border-emerald-500" onclick="app.submitAnswer()">
                             <span>確定</span>
                             <i class="fa-solid fa-check"></i>
                         </button>
@@ -157,31 +255,31 @@
                     <!-- 4. Fraction Input Keypad (Q17, Q18) -->
                     <div id="keypad-fraction" class="hidden max-w-xs mx-auto space-y-3">
                         <!-- Fraction Step Header / Back Button -->
-                        <div class="flex items-center justify-between bg-slate-800 p-2.5 rounded-xl text-xs font-bold text-slate-300 border border-slate-700">
+                        <div class="flex items-center justify-between bg-slate-800 p-3 rounded-xl text-xs font-bold text-slate-300 border border-slate-700">
                             <div class="flex items-center space-x-2">
                                 <span id="frac-step-badge" class="bg-indigo-600 text-white px-2 py-0.5 rounded-md font-mono font-bold">1/2</span>
                                 <span id="frac-status-text">分子（上の数）を入力</span>
                             </div>
-                            <button id="btn-frac-back" class="hidden bg-amber-950/80 hover:bg-amber-900 text-amber-300 px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center space-x-1 shadow-sm border border-amber-800/60" onclick="app.setFractionFocus('num')">
+                            <button id="btn-frac-back" class="hidden bg-amber-950/80 hover:bg-amber-900 text-amber-300 px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center space-x-1 shadow-sm border border-amber-800/60" onclick="app.setFractionFocus('num')">
                                 <i class="fa-solid fa-rotate-left"></i>
                                 <span>分子に戻る</span>
                             </button>
                         </div>
                         
                         <!-- Mini Numpad for Fractions -->
-                        <div class="grid grid-cols-3 gap-2">
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-2.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('7')">7</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-2.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('8')">8</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-2.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('9')">9</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-2.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('4')">4</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-2.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('5')">5</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-2.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('6')">6</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-2.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('1')">1</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-2.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('2')">2</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-2.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('3')">3</button>
-                            <button class="key-btn bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 font-bold text-sm py-2.5 rounded-xl border border-amber-800/60 shadow-sm" onclick="app.clearInput()">C</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-2.5 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('0')">0</button>
-                            <button class="key-btn bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xl py-2.5 rounded-xl shadow-md flex items-center justify-center border border-emerald-500" onclick="app.submitAnswer()">
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('7')">7</button>
+                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('8')">8</button>
+                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('9')">9</button>
+                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('4')">4</button>
+                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('5')">5</button>
+                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('6')">6</button>
+                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('1')">1</button>
+                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('2')">2</button>
+                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('3')">3</button>
+                            <button class="key-btn bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 font-bold text-sm py-3 rounded-xl border border-amber-800/60 shadow-sm" onclick="app.clearInput()">C</button>
+                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('0')">0</button>
+                            <button class="key-btn bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xl py-3 rounded-xl shadow-md flex items-center justify-center border border-emerald-500" onclick="app.submitAnswer()">
                                 <i class="fa-solid fa-check"></i>
                             </button>
                         </div>
@@ -205,7 +303,7 @@
                     <div class="bg-slate-900 p-3 rounded-xl shadow-sm border border-slate-800">
                         <span class="text-xs text-slate-400 font-bold block mb-1">得点</span>
                         <div class="text-3xl font-extrabold text-indigo-400">
-                            <span id="result-score">0</span> <span class="text-base text-slate-400 font-normal">/ 20</span>
+                            <span id="result-score">0</span> <span id="result-total-label" class="text-base text-slate-400 font-normal">/ 20</span>
                         </div>
                     </div>
                     <div class="bg-slate-900 p-3 rounded-xl shadow-sm border border-slate-800">
@@ -296,10 +394,13 @@
 
             initElements() {
                 this.screenStart = document.getElementById('screen-start');
+                this.screenCategory = document.getElementById('screen-category');
                 this.screenQuiz = document.getElementById('screen-quiz');
                 this.screenResult = document.getElementById('screen-result');
                 
                 this.btnStart = document.getElementById('btn-start');
+                this.btnCategorySelect = document.getElementById('btn-category-select');
+                this.btnBackToStart = document.getElementById('btn-back-to-start');
                 this.btnRestart = document.getElementById('btn-restart');
                 this.btnFreePractice = document.getElementById('btn-free-practice');
                 this.dateSeedInput = document.getElementById('date-seed-input');
@@ -318,7 +419,6 @@
                 this.qBadge = document.getElementById('question-number-badge');
                 this.qCategory = document.getElementById('question-category');
                 this.qLabel = document.getElementById('q-label');
-                this.progressBar = document.getElementById('progress-bar');
                 this.problemStatement = document.getElementById('problem-statement');
                 
                 this.inputPreviewBox = document.getElementById('input-preview-box');
@@ -345,7 +445,32 @@
 
             bindEvents() {
                 this.btnStart.addEventListener('click', () => this.startQuiz(false));
-                this.btnRestart.addEventListener('click', () => this.startQuiz(false));
+                this.btnRestart.addEventListener('click', () => {
+                    this.screenResult.classList.add('hidden');
+                    this.screenStart.classList.remove('hidden');
+                });
+                
+                if (this.btnCategorySelect) {
+                    this.btnCategorySelect.addEventListener('click', () => {
+                        this.screenStart.classList.add('hidden');
+                        this.screenCategory.classList.remove('hidden');
+                    });
+                }
+
+                if (this.btnBackToStart) {
+                    this.btnBackToStart.addEventListener('click', () => {
+                        this.screenCategory.classList.add('hidden');
+                        this.screenStart.classList.remove('hidden');
+                    });
+                }
+
+                // Category buttons binding
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const cat = e.currentTarget.getAttribute('data-category');
+                        this.startCategoryPractice(cat);
+                    });
+                });
                 
                 if (this.btnFreePractice) {
                     this.btnFreePractice.addEventListener('click', () => {
@@ -490,7 +615,7 @@
 
                     list.push({
                         id: i,
-                        category: '分数の比較',
+                        category: '分数の大小比較',
                         type: 'inequality',
                         statement: `${num1}/${den1}  [ ? ]  ${num2}/${den2}`,
                         answer: correctSym
@@ -584,12 +709,12 @@
                 } while (
                     hoursFracNum % hoursFracDen === 0 ||
                     !Number.isInteger(minutesVal) ||
-                    gcd(hoursFracNum, hoursFracDen) > 1 // 約分して整数や単純な分数になるものを避ける
+                    gcd(hoursFracNum, hoursFracDen) > 1
                 );
 
                 list.push({
                     id: 17,
-                    category: '時間の変換',
+                    category: '時間の表記',
                     type: 'numeric',
                     statement: `${hoursFracNum}/${hoursFracDen} 時間 = ○ 分`,
                     answer: minutesVal.toString()
@@ -601,11 +726,11 @@
                     g = gcd(rawMins, 60);
                     ansNum = rawMins / g;
                     ansDen = 60 / g;
-                } while (ansDen === 1 || g > 1); // 綺麗に約分されて分母が1になったりするものや単純な約分を避ける
+                } while (ansDen === 1 || g > 1);
 
                 list.push({
                     id: 18,
-                    category: '時間の変換',
+                    category: '時間の表記',
                     type: 'fraction',
                     statement: `${rawMins} 分 = ○ 時間 (分数で入力)`,
                     answerNum: ansNum.toString(),
@@ -618,7 +743,7 @@
                 const secSpeed = kmhSpeed / 3.6;
                 list.push({
                     id: 19,
-                    category: '速さの変換',
+                    category: '単位変換',
                     type: 'numeric',
                     statement: `時速 ${kmhSpeed} km = 秒速 ○ m`,
                     answer: secSpeed.toString()
@@ -629,7 +754,7 @@
                 const kmhVal = (mminSpeed * 60) / 1000;
                 list.push({
                     id: 20,
-                    category: '速さの変換',
+                    category: '単位変換',
                     type: 'numeric',
                     statement: `分速 ${mminSpeed} m = 時速 ○ km`,
                     answer: kmhVal.toString()
@@ -640,11 +765,60 @@
 
             startQuiz(isFreePractice = false) {
                 this.generateQuestions(isFreePractice);
+                this.beginTestSession();
+            }
+
+            startCategoryPractice(catKey) {
+                this.generateQuestions(true); // フリー練習ベースで生成
+                
+                // 指定された単元の問題だけを抽出して必ず5問にする
+                let filtered = [];
+                if (catKey === 'arithmetic') {
+                    filtered = this.questions.filter(q => q.category === '四則演算');
+                } else if (catKey === 'prime') {
+                    filtered = [];
+                    const primes = [2, 3, 5, 7, 11, 13];
+                    const randP = () => Math.floor(Math.random() * primes.length);
+                    for(let i=1; i<=10; i++) {
+                        const p1 = primes[randP()], p2 = primes[randP()], p3 = primes[randP()];
+                        const arr = [p1, p2, p3].sort((a,b)=>a-b);
+                        const prod = p1 * p2 * p3;
+                        filtered.push({
+                            id: i,
+                            category: '素因数分解',
+                            type: 'prime',
+                            statement: `${prod} の素因数分解 =`,
+                            answer: arr.join('×'),
+                            answerPrimes: arr
+                        });
+                    }
+                } else if (catKey === 'fraction_compare') {
+                    filtered = this.questions.filter(q => q.category === '分数の大小比較');
+                } else if (catKey === 'ratio') {
+                    filtered = this.questions.filter(q => q.category === '割合計算');
+                } else if (catKey === 'time_notation') {
+                    filtered = this.questions.filter(q => q.category === '時間の表記');
+                } else if (catKey === 'speed_unit') {
+                    filtered = this.questions.filter(q => q.category === '単位変換');
+                }
+
+                // 足りない場合は複製またはランダム生成で必ず5問にする
+                while (filtered.length < 5) {
+                    filtered.push({...filtered[0], id: filtered.length + 1});
+                }
+                // ちょうど5問にカット
+                this.questions = filtered.slice(0, 5);
+
+                this.beginTestSession();
+            }
+
+            beginTestSession() {
                 this.currentIndex = 0;
                 this.userAnswers = [];
                 this.elapsedSeconds = 0;
 
                 this.screenStart.classList.add('hidden');
+                this.screenCategory.classList.add('hidden');
                 this.screenResult.classList.add('hidden');
                 this.screenQuiz.classList.remove('hidden');
                 this.screenQuiz.classList.add('flex');
@@ -674,12 +848,12 @@
 
             renderCurrentQuestion() {
                 const q = this.questions[this.currentIndex];
+                const totalQ = this.questions.length;
                 
-                // Update badges & progress
-                this.qBadge.textContent = `問 ${this.currentIndex + 1} / 20`;
+                // Update badges
+                this.qBadge.textContent = `問 ${this.currentIndex + 1} / ${totalQ}`;
                 this.qCategory.textContent = q.category;
-                this.qLabel.textContent = `Q${q.id}`;
-                this.progressBar.style.width = `${((this.currentIndex + 1) / 20) * 100}%`;
+                this.qLabel.textContent = `Q${this.currentIndex + 1}`;
 
                 // Render Problem Statement
                 this.problemStatement.textContent = q.statement;
@@ -818,7 +992,7 @@
                 let userDisplayAnswer = '';
 
                 if (q.type === 'numeric') {
-                    if (!this.inputState.num) return; // Prompt input
+                    if (!this.inputState.num) return;
                     userDisplayAnswer = this.inputState.num;
                     isCorrect = (userDisplayAnswer.trim() === q.answer.trim());
                 } else if (q.type === 'prime') {
@@ -831,14 +1005,12 @@
                     userDisplayAnswer = this.inputState.inequality;
                     isCorrect = (userDisplayAnswer === q.answer);
                 } else if (q.type === 'fraction') {
-                    // Step 1: If currently entering numerator, pressing ✓ moves directly to denominator input
                     if (this.inputState.fracFocus === 'num') {
-                        if (!this.inputState.num) return; // Wait until numerator is typed
+                        if (!this.inputState.num) return;
                         this.setFractionFocus('den');
-                        return; // Do not submit final answer yet
+                        return;
                     }
 
-                    // Step 2: If currently entering denominator, pressing ✓ submits final answer
                     if (!this.inputState.num || !this.inputState.den) return;
                     userDisplayAnswer = `${this.inputState.num}/${this.inputState.den}`;
                     isCorrect = (this.inputState.num === q.answerNum && this.inputState.den === q.answerDen);
@@ -851,7 +1023,7 @@
                 });
 
                 // Next question or Finish
-                if (this.currentIndex < 19) {
+                if (this.currentIndex < this.questions.length - 1) {
                     this.currentIndex++;
                     this.renderCurrentQuestion();
                 } else {
@@ -866,9 +1038,13 @@
                 this.screenResult.classList.remove('hidden');
                 this.screenResult.classList.add('flex');
 
-                // Calculate Score
+                const totalQ = this.questions.length;
                 const score = this.userAnswers.filter(a => a.isCorrect).length;
-                this.resultScore.textContent = score;
+                this.resultScore.textContent = `${score}`;
+                const resultTotalLabel = document.getElementById('result-total-label');
+                if (resultTotalLabel) {
+                    resultTotalLabel.textContent = ` / ${totalQ}`;
+                }
 
                 // Time Format
                 const elapsedMs = Date.now() - this.startTime;
@@ -876,21 +1052,17 @@
                 const s = String(Math.floor((elapsedMs % 60000) / 1000)).padStart(2, '0');
                 const cs = String(Math.floor((elapsedMs % 1000) / 10)).padStart(2, '0');
                 
-                // 画面表示上は 1/100 秒まで表示 (例: 01:23.45)
                 this.resultTime.textContent = `${m}:${s}.${cs}`;
-
-                // 記録用タイム（秒単位: 01:23）
                 const timeStr = `${m}:${s}`;
 
-                // Reset copy button text
                 this.copyBtnText.textContent = '結果をコピーする（報告・記録用）';
 
-                // Save to history list (Keep latest 10)
+                // Save to history list
                 const now = new Date();
                 const dateStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
                 
                 this.history.unshift({
-                    score: score,
+                    score: `${score}/${totalQ}`,
                     timeStr: timeStr,
                     dateStr: dateStr
                 });
@@ -931,9 +1103,8 @@
             copyResultToClipboard() {
                 const score = this.resultScore.textContent;
                 const timeStr = this.resultTime.textContent;
-                const shareText = `【計算テスト結果】\n得点: ${score} / 20点\nクリアタイム: ${timeStr}`;
+                const shareText = `【計算テスト結果】\n得点: ${score}点\nクリアタイム: ${timeStr}`;
 
-                // Fallback copying mechanism for iframe compatibility
                 const textArea = document.createElement('textarea');
                 textArea.value = shareText;
                 document.body.appendChild(textArea);
@@ -981,7 +1152,7 @@
                             <span class="text-xs text-slate-400 font-medium">${item.dateStr}</span>
                         </div>
                         <div class="flex items-center space-x-4">
-                            <span class="font-extrabold text-indigo-300">${item.score} <span class="text-xs text-slate-400 font-normal">/20点</span></span>
+                            <span class="font-extrabold text-indigo-300">${item.score} <span class="text-xs text-slate-400 font-normal">点</span></span>
                             <span class="font-mono text-slate-300 font-bold text-xs"><i class="fa-regular fa-clock mr-1 text-slate-400"></i>${item.timeStr}</span>
                         </div>
                     `;
@@ -990,7 +1161,6 @@
             }
         }
 
-        // Initialize App on Window Load
         let app;
         window.onload = function() {
             app = new MathQuizApp();
