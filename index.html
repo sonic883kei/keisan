@@ -3,1168 +3,583 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>計算テスト生成＆学習アプリ</title>
-    <!-- Tailwind CSS CDN -->
+    <title>SPI非言語分野 演習＆CBT模擬試験</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap');
-        body {
-            font-family: 'M PLUS Rounded 1c', 'Inter', sans-serif;
-            background-color: #0f172a; /* Dark background */
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans JP', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
         }
-        /* Custom Keypad active effects */
-        .key-btn:active {
-            transform: scale(0.95);
+    </script>
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+        
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        #explanation-content strong {
+            color: #c7d2fe;
+            font-weight: 700;
+            background-color: rgba(99, 102, 241, 0.2);
+            padding: 4px 8px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 6px;
+            border: 1px solid rgba(129, 140, 248, 0.4);
+            font-family: monospace, sans-serif;
+            font-size: 0.9em;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen flex flex-col justify-between">
 
-    <!-- Header -->
-    <header class="bg-slate-900 border-b border-slate-800 text-white shadow-md">
+    <!-- HEADER -->
+    <header class="bg-[#111827]/90 backdrop-blur-md text-white border-b border-slate-800/80 sticky top-0 z-40">
         <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <i class="fa-solid font-bold fa-calculator text-2xl text-amber-400"></i>
-                <h1 class="text-xl font-bold tracking-wide">計算テスト トレーニング</h1>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button id="btn-history-header" class="bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-full text-xs md:text-sm font-bold flex items-center space-x-1.5 border border-slate-700 transition-all shadow-sm">
-                    <i class="fa-solid fa-clock-rotate-left text-amber-400"></i>
-                    <span>履歴</span>
+                <button onclick="goToLanding()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 py-1.5 px-3 rounded-xl text-xs transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-house text-indigo-400"></i>
+                    <span class="hidden sm:inline">トップ</span>
                 </button>
-                <div id="header-timer" class="hidden flex items-center space-x-2 bg-slate-800 px-3 py-1.5 rounded-full font-mono text-lg font-semibold border border-slate-700 text-indigo-300">
-                    <i class="fa-regular fa-clock text-amber-400"></i>
-                    <span id="timer-display">00:00.00</span>
-                </div>
+                
+                <button id="nav-change-config-btn" onclick="goToSelectScreen()" class="hidden bg-indigo-950/80 hover:bg-indigo-900/80 text-indigo-200 border border-indigo-700/60 py-1.5 px-3 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-sliders text-indigo-400"></i>
+                    <span>単元・レベル変更</span>
+                </button>
+
+                <button onclick="openReviewModal()" class="text-xs bg-indigo-950/80 hover:bg-indigo-900/80 text-indigo-300 border border-indigo-700/60 py-1.5 px-3 rounded-xl transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-list-check text-indigo-400"></i>
+                    <span>回答振り返り</span>
+                </button>
+
+                <button onclick="openStatsModal()" class="text-xs bg-amber-950/80 hover:bg-amber-900/80 text-amber-300 border border-amber-700/60 py-1.5 px-3 rounded-xl transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-chart-pie text-amber-400"></i>
+                    <span>分析</span>
+                </button>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <button onclick="openHistoryModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 py-1.5 px-3 rounded-xl transition flex items-center space-x-1">
+                    <i class="fa-solid fa-clock-rotate-left text-teal-400"></i>
+                    <span class="inline">履歴</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-grow flex items-center justify-center p-4">
-        <div class="w-full max-w-xl bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden min-h-[500px] flex flex-col justify-between">
-            
-            <!-- Start Screen -->
-            <div id="screen-start" class="p-6 md:p-8 flex flex-col items-center justify-center text-center my-auto space-y-6">
-                <div class="w-20 h-20 bg-indigo-950 text-indigo-400 rounded-full flex items-center justify-center text-4xl shadow-inner border border-indigo-900">
-                    <i class="fa-solid fa-graduation-cap"></i>
+    <main class="max-w-3xl mx-auto w-full px-4 py-6 flex-grow flex flex-col justify-center">
+
+        <!-- 1. LANDING VIEW -->
+        <section id="view-landing" class="w-full animate-fade-in my-auto">
+            <div class="bg-[#141a2e] rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-800 text-center max-w-lg mx-auto">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-400 mb-4 border border-indigo-500/20">
+                    <i class="fa-solid fa-graduation-cap text-3xl"></i>
                 </div>
-                <div>
-                    <h2 class="text-2xl md:text-3xl font-extrabold text-slate-100 mb-2">20問 計算力チャレンジ</h2>
+                <h1 class="text-2xl font-extrabold text-white mb-2">SPI非言語問題 演習アプリ</h1>
+                <p class="text-xs md:text-sm text-slate-400 mb-8 leading-relaxed">
+                    単元とレベルを自由に組み合わせてじっくり演習・CBT模擬試験
+                </p>
+
+                <div class="space-y-4">
+                    <button onclick="goToSelectScreen()" class="w-full p-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold transition flex items-center justify-between group shadow-lg shadow-indigo-950/50">
+                        <div class="flex items-center space-x-3 text-left">
+                            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-lg shrink-0">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm md:text-base font-bold">通常 問題演習モード</h3>
+                                <p class="text-[11px] text-indigo-200 font-normal">単元とレベルを選んで集中演習</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-indigo-200 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+
+                    <button onclick="openCBTModal()" class="w-full p-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold transition flex items-center justify-between group shadow-lg shadow-emerald-950/50">
+                        <div class="flex items-center space-x-3 text-left">
+                            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-lg shrink-0">
+                                <i class="fa-solid fa-laptop-code"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm md:text-base font-bold">CBT 模擬試験モード</h3>
+                                <p class="text-[11px] text-emerald-200 font-normal">本番形式の問題可変型テスト</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-emerald-200 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
                 </div>
 
-                <!-- 日付指定設定（共通問題用） -->
-                <div class="w-full bg-slate-800/60 border border-slate-700/80 rounded-xl p-3.5 text-left space-y-2">
-                    <label for="date-seed-input" class="block text-xs font-bold text-slate-300 flex items-center justify-between">
-                        <span><i class="fa-solid fa-calendar-day text-indigo-400 mr-1.5"></i>全員で同じ問題を解く（日付指定）</span>
-                        <span class="text-[10px] text-slate-400 font-normal">※デフォルトは今日</span>
-                    </label>
-                    <div class="flex items-center space-x-2">
-                        <input type="date" id="date-seed-input" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 flex-grow font-sans focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <button type="button" id="btn-free-practice" class="bg-amber-600/80 hover:bg-amber-600 active:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition-colors shrink-0 shadow-sm flex items-center space-x-1 border border-amber-500/40">
-                            <i class="fa-solid fa-shuffle"></i>
-                            <span>フリー練習</span>
+                <div class="mt-8 pt-5 border-t border-slate-800 flex justify-center items-center space-x-3 flex-wrap gap-y-2">
+                    <button onclick="openStatsModal()" class="text-xs text-amber-300 hover:text-amber-200 bg-amber-950/60 px-3 py-2 rounded-xl border border-amber-700/60 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-chart-pie text-amber-400"></i>
+                        <span>成績分析 (正答率・解答時間)</span>
+                    </button>
+                    <button onclick="openHistoryModal()" class="text-xs text-slate-400 hover:text-slate-200 bg-slate-800/80 px-3 py-2 rounded-xl border border-slate-700 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-clock-rotate-left text-teal-400"></i>
+                        <span>学習履歴 (直近10回)</span>
+                    </button>
+                    <button onclick="resetStats()" class="text-xs text-slate-400 hover:text-slate-200 bg-slate-800/80 px-3 py-2 rounded-xl border border-slate-700 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>成績クリア</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. UNIT & LEVEL SELECT VIEW -->
+        <section id="view-select" class="hidden w-full animate-fade-in max-w-xl mx-auto">
+            <div class="bg-[#141a2e] rounded-3xl p-6 shadow-xl border border-slate-800">
+                <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-800">
+                    <h2 class="text-lg font-extrabold text-white flex items-center">
+                        <i class="fa-solid fa-sliders text-indigo-400 mr-2"></i>単元・レベルの選択
+                    </h2>
+                    <span class="text-xs text-slate-400">ステップ 1/2</span>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2.5">演習する単元</label>
+                    <div class="grid grid-cols-2 gap-2" id="unit-selection-grid">
+                        <button onclick="selectConfigUnit('all')" data-unit="all" class="cfg-unit-btn p-3 rounded-2xl border text-left transition flex items-center space-x-2.5 bg-indigo-600 border-indigo-400 text-white font-bold">
+                            <i class="fa-solid fa-layer-group text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">全単元 混合</div>
+                            </div>
+                        </button>
+                        <button onclick="selectConfigUnit('set')" data-unit="set" class="cfg-unit-btn p-3 rounded-2xl border border-slate-700 bg-[#1b233a] text-slate-300 text-left transition flex items-center space-x-2.5 hover:border-slate-600">
+                            <i class="fa-solid fa-diagram-project text-indigo-400 text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">① 集合</div>
+                            </div>
+                        </button>
+                        <button onclick="selectConfigUnit('settlement')" data-unit="settlement" class="cfg-unit-btn p-3 rounded-2xl border border-slate-700 bg-[#1b233a] text-slate-300 text-left transition flex items-center space-x-2.5 hover:border-slate-600">
+                            <i class="fa-solid fa-calculator text-indigo-400 text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">② 代金清算</div>
+                            </div>
+                        </button>
+                        <button onclick="selectConfigUnit('discount')" data-unit="discount" class="cfg-unit-btn p-3 rounded-2xl border border-slate-700 bg-[#1b233a] text-slate-300 text-left transition flex items-center space-x-2.5 hover:border-slate-600">
+                            <i class="fa-solid fa-tags text-indigo-400 text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">③ 料金割引</div>
+                            </div>
+                        </button>
+                        <button onclick="selectConfigUnit('installment')" data-unit="installment" class="cfg-unit-btn p-3 rounded-2xl border border-slate-700 bg-[#1b233a] text-slate-300 text-left transition flex items-center space-x-2.5 hover:border-slate-600">
+                            <i class="fa-solid fa-credit-card text-indigo-400 text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">④ 分割払い</div>
+                            </div>
+                        </button>
+                        <button onclick="selectConfigUnit('speed')" data-unit="speed" class="cfg-unit-btn p-3 rounded-2xl border border-slate-700 bg-[#1b233a] text-slate-300 text-left transition flex items-center space-x-2.5 hover:border-slate-600">
+                            <i class="fa-solid fa-gauge-high text-indigo-400 text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">⑤ 速さ①</div>
+                            </div>
+                        </button>
+                        <button onclick="selectConfigUnit('timetable')" data-unit="timetable" class="cfg-unit-btn p-3 rounded-2xl border border-slate-700 bg-[#1b233a] text-slate-300 text-left transition flex items-center space-x-2.5 hover:border-slate-600">
+                            <i class="fa-solid fa-train-subway text-indigo-400 text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">⑤ 速さ②(時刻表)</div>
+                            </div>
+                        </button>
+                        <button onclick="selectConfigUnit('profit')" data-unit="profit" class="cfg-unit-btn p-3 rounded-2xl border border-slate-700 bg-[#1b233a] text-slate-300 text-left transition flex items-center space-x-2.5 hover:border-slate-600">
+                            <i class="fa-solid fa-coins text-indigo-400 text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">⑥ 損益算</div>
+                            </div>
+                        </button>
+                        <button onclick="selectConfigUnit('probability')" data-unit="probability" class="cfg-unit-btn p-3 rounded-2xl border border-slate-700 bg-[#1b233a] text-slate-300 text-left transition flex items-center space-x-2.5 hover:border-slate-600">
+                            <i class="fa-solid fa-dice text-indigo-400 text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">⑦ 場合の数・確率</div>
+                            </div>
+                        </button>
+                        <button onclick="selectConfigUnit('logical')" data-unit="logical" class="cfg-unit-btn p-3 rounded-2xl border border-slate-700 bg-[#1b233a] text-slate-300 text-left transition flex items-center space-x-2.5 hover:border-slate-600">
+                            <i class="fa-solid fa-brain text-indigo-400 text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">⑧ 推論①</div>
+                            </div>
+                        </button>
+                        <button onclick="selectConfigUnit('inference')" data-unit="inference" class="cfg-unit-btn p-3 rounded-2xl border border-slate-700 bg-[#1b233a] text-slate-300 text-left transition flex items-center space-x-2.5 hover:border-slate-600">
+                            <i class="fa-solid fa-weight-scale text-indigo-400 text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">⑧ 推論②(数量推理)</div>
+                            </div>
+                        </button>
+                        <button onclick="selectConfigUnit('table')" data-unit="table" class="cfg-unit-btn p-3 rounded-2xl border border-slate-700 bg-[#1b233a] text-slate-300 text-left transition flex items-center space-x-2.5 hover:border-slate-600">
+                            <i class="fa-solid fa-table-cells text-indigo-400 text-base"></i>
+                            <div>
+                                <div class="text-xs font-bold">⑨ 表の読み取り</div>
+                            </div>
                         </button>
                     </div>
                 </div>
 
-                <div class="w-full space-y-3">
-                    <button id="btn-start" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-lg rounded-xl shadow-lg shadow-indigo-950 transition-all duration-150 transform active:scale-98 flex items-center justify-center space-x-2 border border-indigo-500">
-                        <span>テストを開始する (全20問)</span>
-                        <i class="fa-solid fa-play"></i>
-                    </button>
-                    <button id="btn-category-select" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-bold text-base rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 border border-slate-700">
-                        <i class="fa-solid fa-list-check text-amber-400"></i>
-                        <span>単元別に練習する</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Category Select Screen -->
-            <div id="screen-category" class="hidden p-6 md:p-8 flex flex-col justify-between my-auto space-y-6">
-                <div class="text-center space-y-2">
-                    <div class="inline-block p-3 bg-indigo-950 text-indigo-400 rounded-full text-2xl mb-1 border border-indigo-800">
-                        <i class="fa-solid fa-list-check"></i>
+                <div class="mb-8">
+                    <label class="block text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2.5">難易度（レベル）</label>
+                    <div class="grid grid-cols-4 gap-2" id="level-selection-grid">
+                        <button onclick="selectConfigLevel('all')" data-level="all" class="cfg-lvl-btn p-2.5 rounded-xl border border-indigo-400 bg-indigo-600 text-white text-xs font-bold text-center">
+                            全レベル
+                        </button>
+                        <button onclick="selectConfigLevel('1')" data-level="1" class="cfg-lvl-btn p-2.5 rounded-xl border border-slate-700 bg-[#1b233a] text-slate-300 text-xs font-bold text-center hover:border-slate-600">
+                            Lv.1 基本
+                        </button>
+                        <button onclick="selectConfigLevel('2')" data-level="2" class="cfg-lvl-btn p-2.5 rounded-xl border border-slate-700 bg-[#1b233a] text-slate-300 text-xs font-bold text-center hover:border-slate-600">
+                            Lv.2 応用
+                        </button>
+                        <button onclick="selectConfigLevel('3')" data-level="3" class="cfg-lvl-btn p-2.5 rounded-xl border border-slate-700 bg-[#1b233a] text-slate-300 text-xs font-bold text-center hover:border-slate-600">
+                            Lv.3 高難度
+                        </button>
                     </div>
-                    <h2 class="text-xl md:text-2xl font-extrabold text-slate-100">単元別トレーニング</h2>
-                    <p class="text-slate-400 text-xs">集中して練習したい単元をえらんでください</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="arithmetic">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
-                                <i class="fa-solid fa-calculator"></i>
-                            </div>
-                            <div>
-                                <div class="text-slate-200 text-base">四則演算</div>
-                                <div class="text-slate-400 text-xs font-normal">2〜3桁の足し算・引き算・掛け算・割り算</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
-                    </button>
+                <button onclick="startPracticeWithConfig()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-lg shadow-indigo-950/60 transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-play"></i>
+                    <span>この条件で演習を始める</span>
+                </button>
+            </div>
+        </section>
 
-                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="prime">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
-                                <i class="fa-solid fa-network-wired"></i>
-                            </div>
-                            <div>
-                                <div class="text-slate-200 text-base">素因数分解</div>
-                                <div class="text-slate-400 text-xs font-normal">2〜13の素数を使った因数分解練習</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
-                    </button>
+        <!-- 3. CBT STATUS BAR -->
+        <section id="cbt-status-bar" class="hidden mb-5 bg-[#141a2e] text-white rounded-3xl p-5 shadow-2xl border border-slate-800 max-w-2xl mx-auto w-full animate-fade-in">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                
+                <div class="relative w-24 h-24 flex items-center justify-center shrink-0">
+                    <svg class="w-full h-full" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="50" stroke="#1e293b" stroke-width="8" fill="transparent" />
+                        <circle id="cbt-circle-outer" class="progress-ring-circle" cx="60" cy="60" r="50" 
+                                stroke="#10b981" stroke-width="8" fill="transparent" 
+                                stroke-linecap="round" stroke-dasharray="314.16" stroke-dashoffset="0" />
+                        
+                        <circle cx="60" cy="60" r="36" stroke="#1e293b" stroke-width="8" fill="transparent" />
+                        <circle id="cbt-circle-inner" class="progress-ring-circle" cx="60" cy="60" r="36" 
+                                stroke="#6366f1" stroke-width="8" fill="transparent" 
+                                stroke-linecap="round" stroke-dasharray="226.19" stroke-dashoffset="226.19" />
+                    </svg>
+                </div>
 
-                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="fraction_compare">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
-                                <i class="fa-solid fa-scale-balanced"></i>
-                            </div>
-                            <div>
-                                <div class="text-slate-200 text-base">分数の大小比較</div>
-                                <div class="text-slate-400 text-xs font-normal">わずかな差の分数を不等号で比較</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
-                    </button>
+                <div class="flex-grow text-center sm:text-left">
+                    <div class="flex items-center justify-center sm:justify-start space-x-2">
+                        <span id="cbt-mode-badge" class="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs font-bold inline-flex items-center">
+                            <i class="fa-solid fa-laptop-code mr-1.5"></i> ミニテスト
+                        </span>
+                        <span class="text-xs text-slate-400 font-medium">CBT模擬試験中</span>
+                    </div>
+                </div>
 
-                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="ratio">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
-                                <i class="fa-solid fa-percent"></i>
-                            </div>
-                            <div>
-                                <div class="text-slate-200 text-base">割合計算</div>
-                                <div class="text-slate-400 text-xs font-normal">割増・割引・もとにする量の計算</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
-                    </button>
-
-                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="time_notation">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
-                                <i class="fa-regular fa-clock"></i>
-                            </div>
-                            <div>
-                                <div class="text-slate-200 text-base">時間の表記</div>
-                                <div class="text-slate-400 text-xs font-normal">時間と分の相互変換（分数入力）</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
-                    </button>
-
-                    <button class="category-btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 p-4 rounded-xl text-left font-bold flex items-center justify-between transition-all group" data-category="speed_unit">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-950 text-indigo-300 flex items-center justify-center border border-indigo-900 group-hover:bg-indigo-900">
-                                <i class="fa-solid fa-gauge-high"></i>
-                            </div>
-                            <div>
-                                <div class="text-slate-200 text-base">単位変換</div>
-                                <div class="text-slate-400 text-xs font-normal">時速・秒速・分速の単位変換</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+                <div class="shrink-0 w-full sm:w-auto">
+                    <button onclick="exitCBTMode()" class="w-full sm:w-auto bg-slate-800/90 hover:bg-rose-950/50 hover:text-rose-300 text-slate-400 border border-slate-700/80 hover:border-rose-800/60 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5">
+                        <i class="fa-solid fa-rectangle-xmark"></i>
+                        <span>テスト中断</span>
                     </button>
                 </div>
 
-                <button id="btn-back-to-start" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm rounded-xl border border-slate-700 transition-all">
-                    <i class="fa-solid fa-arrow-left mr-2"></i>メニューに戻る
+            </div>
+        </section>
+
+        <!-- 4. PRACTICE VIEW -->
+        <section id="view-practice" class="hidden w-full animate-fade-in max-w-2xl mx-auto my-auto">
+            
+            <div id="practice-config-banner" class="mb-4 bg-[#141a2e] rounded-xl px-4 py-2.5 border border-slate-800 flex justify-between items-center text-xs">
+                <div class="flex items-center space-x-2">
+                    <span class="text-slate-400">現在の設定:</span>
+                    <span id="active-config-badge" class="px-2.5 py-0.5 rounded-md bg-indigo-950 text-indigo-300 font-bold border border-indigo-800/50">
+                        全単元 / 全レベル
+                    </span>
+                </div>
+                <button onclick="goToSelectScreen()" class="text-indigo-400 hover:text-indigo-300 font-bold flex items-center space-x-1">
+                    <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+                    <span>変更</span>
                 </button>
             </div>
 
-            <!-- Quiz Screen -->
-            <div id="screen-quiz" class="hidden flex-col justify-between h-full p-4 md:p-6">
-                <!-- Top Badge Header (Progress Bar Removed) -->
-                <div>
-                    <div class="flex justify-between items-center text-sm font-semibold text-slate-400 mb-2">
-                        <span id="question-number-badge" class="bg-indigo-950 text-indigo-300 border border-indigo-800/60 px-3.5 py-1.5 rounded-full text-xs font-bold">問 1 / 20</span>
-                        <span id="question-category" class="text-slate-400 text-xs">四則演算</span>
-                    </div>
+            <!-- Question Card -->
+            <div id="question-card" class="bg-[#141a2e] rounded-3xl p-5 md:p-7 shadow-xl border border-slate-800 relative overflow-hidden mb-5">
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-4">
+                    <div id="timer-bar" class="bg-indigo-500 h-full w-full transition-all duration-100 linear"></div>
                 </div>
 
-                <!-- Problem Card Display -->
-                <div class="my-4 py-6 px-4 bg-slate-800/70 border border-slate-700/60 rounded-2xl flex flex-col items-center justify-center min-h-[140px] text-center relative shadow-inner">
-                    <span class="absolute top-2 left-3 text-xs font-bold text-slate-400" id="q-label">Q1</span>
-                    <div id="problem-statement" class="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-wider">
-                        <!-- Problem text inserted dynamically -->
+                <div id="q-meta-header" class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4 text-xs">
+                    <div class="flex items-center space-x-2">
+                        <span id="unit-badge" class="px-2.5 py-0.5 rounded-full font-bold bg-slate-800 text-slate-200 border border-slate-700">
+                            単元
+                        </span>
+                        <span id="q-badge" class="px-2.5 py-0.5 rounded-full font-bold bg-indigo-950 text-indigo-300 border border-indigo-800/50">
+                            Lv.1
+                        </span>
                     </div>
-                    <!-- Current Input Preview Area -->
-                    <div id="input-preview-box" class="mt-4 min-h-[52px] flex items-center justify-center text-indigo-300 font-bold text-xl md:text-2xl bg-slate-900 px-6 py-2.5 rounded-xl border-2 border-indigo-900/80 shadow-sm w-full max-w-xs">
-                        <span id="input-preview-text" class="placeholder-text text-slate-500 font-normal text-base">解答を入力してください</span>
-                    </div>
+                    <span id="q-pattern-title" class="text-slate-400 font-medium truncate max-w-[200px]">
+                        パターン名
+                    </span>
                 </div>
 
-                <!-- Dynamic Keypads (Enlarged with wider gaps) -->
-                <div id="keypad-container" class="w-full">
-                    
-                    <!-- 1. Numeric Keypad (Standard) -->
-                    <div id="keypad-numeric" class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('7')">7</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('8')">8</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('9')">9</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('4')">4</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('5')">5</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('6')">6</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('1')">1</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('2')">2</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('3')">3</button>
-                        <button class="key-btn bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 font-bold text-lg py-4 rounded-xl border border-amber-800/60 shadow-sm" onclick="app.clearInput()">C</button>
-                        <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-2xl py-4 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('0')">0</button>
-                        <button class="key-btn bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-2xl py-4 rounded-xl shadow-md flex items-center justify-center border border-emerald-500" onclick="app.submitAnswer()">
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-                    </div>
+                <div class="text-slate-100 text-sm md:text-base leading-relaxed font-medium mb-5" id="q-text">
+                    問題を取得しています...
+                </div>
 
-                    <!-- 2. Prime Factors Keypad (Q10) -->
-                    <div id="keypad-prime" class="hidden max-w-sm mx-auto space-y-3">
-                        <div class="grid grid-cols-3 gap-3">
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(2)">2</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(3)">3</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(5)">5</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(7)">7</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(11)">11</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(13)">13</button>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <button class="key-btn bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 font-bold text-base py-3.5 rounded-xl border border-amber-800/60 shadow-sm" onclick="app.clearInput()">1文字消す</button>
-                            <button class="key-btn bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xl py-3.5 rounded-xl shadow-md flex items-center justify-center space-x-1 border border-emerald-500" onclick="app.submitAnswer()">
-                                <span>確定</span>
-                                <i class="fa-solid fa-check"></i>
-                            </button>
-                        </div>
-                    </div>
+                <div class="bg-[#1c243c] border-l-4 border-indigo-500 p-3.5 rounded-r-xl mb-5">
+                    <p class="font-bold text-indigo-200 text-xs md:text-sm" id="q-prompt">
+                        ---
+                    </p>
+                </div>
 
-                    <!-- 3. Inequality Keypad (Q11, Q12) -->
-                    <div id="keypad-inequality" class="hidden max-w-xs mx-auto space-y-3">
-                        <div class="grid grid-cols-3 gap-3">
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-3xl py-6 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.selectInequality('<')">&lt;</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-3xl py-6 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.selectInequality('=')">=</button>
-                            <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-3xl py-6 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.selectInequality('>')">&gt;</button>
-                        </div>
-                        <button class="key-btn w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xl py-3.5 rounded-xl shadow-md flex items-center justify-center space-x-1 border border-emerald-500" onclick="app.submitAnswer()">
-                            <span>確定</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-                    </div>
-
-                    <!-- 4. Fraction Input Keypad (Q17, Q18) -->
-                    <div id="keypad-fraction" class="hidden max-w-xs mx-auto space-y-3">
-                        <!-- Fraction Step Header / Back Button -->
-                        <div class="flex items-center justify-between bg-slate-800 p-3 rounded-xl text-xs font-bold text-slate-300 border border-slate-700">
-                            <div class="flex items-center space-x-2">
-                                <span id="frac-step-badge" class="bg-indigo-600 text-white px-2 py-0.5 rounded-md font-mono font-bold">1/2</span>
-                                <span id="frac-status-text">分子（上の数）を入力</span>
-                            </div>
-                            <button id="btn-frac-back" class="hidden bg-amber-950/80 hover:bg-amber-900 text-amber-300 px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center space-x-1 shadow-sm border border-amber-800/60" onclick="app.setFractionFocus('num')">
-                                <i class="fa-solid fa-rotate-left"></i>
-                                <span>分子に戻る</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Mini Numpad for Fractions -->
-                        <div class="grid grid-cols-3 gap-3">
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('7')">7</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('8')">8</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('9')">9</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('4')">4</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('5')">5</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('6')">6</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('1')">1</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('2')">2</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('3')">3</button>
-                            <button class="key-btn bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 font-bold text-sm py-3 rounded-xl border border-amber-800/60 shadow-sm" onclick="app.clearInput()">C</button>
-                            <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('0')">0</button>
-                            <button class="key-btn bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xl py-3 rounded-xl shadow-md flex items-center justify-center border border-emerald-500" onclick="app.submitAnswer()">
-                                <i class="fa-solid fa-check"></i>
-                            </button>
-                        </div>
-                    </div>
-
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5" id="choices-container">
                 </div>
             </div>
 
-            <!-- Result Screen -->
-            <div id="screen-result" class="hidden p-6 md:p-8 flex-col my-auto space-y-6">
-                <div class="text-center space-y-2">
-                    <div class="inline-block p-3 bg-emerald-950 text-emerald-400 rounded-full text-3xl mb-1 border border-emerald-800">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                    <h2 class="text-2xl font-extrabold text-slate-100">テスト結果</h2>
-                    <p class="text-slate-400 text-sm">お疲れさまでした！採点結果です。</p>
+            <!-- Explanation Card -->
+            <div id="explanation-card" class="hidden bg-[#141a2e] rounded-3xl p-5 md:p-7 shadow-xl border border-slate-800 animate-fade-in mb-5">
+                <div id="result-banner" class="rounded-2xl p-4 mb-5 flex items-center space-x-3">
                 </div>
 
-                <!-- Score Overview Card -->
-                <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 grid grid-cols-2 gap-4 text-center">
-                    <div class="bg-slate-900 p-3 rounded-xl shadow-sm border border-slate-800">
-                        <span class="text-xs text-slate-400 font-bold block mb-1">得点</span>
-                        <div class="text-3xl font-extrabold text-indigo-400">
-                            <span id="result-score">0</span> <span id="result-total-label" class="text-base text-slate-400 font-normal">/ 20</span>
-                        </div>
-                    </div>
-                    <div class="bg-slate-900 p-3 rounded-xl shadow-sm border border-slate-800">
-                        <span class="text-xs text-slate-400 font-bold block mb-1">クリアタイム</span>
-                        <div class="text-2xl font-extrabold text-slate-200 mt-1 font-mono" id="result-time">
-                            00:00
-                        </div>
-                    </div>
+                <h3 class="text-base font-bold text-slate-100 mb-3 flex items-center">
+                    <i class="fa-solid fa-lightbulb text-amber-400 mr-2"></i>解法・解説ステップ
+                </h3>
+
+                <div class="space-y-3 text-xs md:text-sm text-slate-300 leading-relaxed mb-6" id="explanation-content">
                 </div>
 
-                <!-- Detailed Answers List -->
-                <div class="space-y-2">
-                    <h3 class="font-bold text-slate-300 text-sm flex items-center justify-between">
-                        <span>問題一覧と正誤</span>
-                        <span class="text-xs font-normal text-slate-400">（スクロールして全確認）</span>
-                    </h3>
-                    <div id="results-detail-list" class="max-h-52 overflow-y-auto space-y-2 pr-1 text-sm">
-                        <!-- Items rendered by JS -->
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="space-y-2 pt-2">
-                    <button id="btn-copy-result" class="w-full py-3 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 border border-slate-700">
-                        <i class="fa-regular fa-copy text-amber-400"></i>
-                        <span id="copy-btn-text">結果をコピーする（報告・記録用）</span>
-                    </button>
-                    <button id="btn-restart" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-base rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 border border-indigo-500">
-                        <i class="fa-solid fa-rotate-right"></i>
-                        <span>もう一度挑戦する（新しい問題）</span>
+                <div class="pt-3 border-t border-slate-800 flex justify-end">
+                    <button onclick="generateNewQuestion()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-6 rounded-xl transition flex items-center justify-center space-x-2 shadow-md shadow-indigo-950/50">
+                        <span>次の問題に進む</span>
+                        <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
+        </section>
 
-        </div>
+        <!-- 5. CBT RESULT CARD VIEW -->
+        <section id="cbt-result-card" class="hidden bg-[#141a2e] rounded-3xl p-6 md:p-8 shadow-xl border border-slate-800 max-w-2xl mx-auto w-full animate-fade-in">
+            <div class="text-center pb-5 border-b border-slate-800 mb-6">
+                <span class="px-3 py-1 bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 rounded-full text-xs font-bold">
+                    CBT TEST RESULT
+                </span>
+                <h2 class="text-2xl font-extrabold text-white mt-2">CBT模擬試験 結果</h2>
+            </div>
+
+            <div id="cbt-sync-date-display" class="hidden text-center mb-4 text-xs font-bold text-indigo-300 bg-indigo-950/60 py-2.5 px-4 rounded-2xl border border-indigo-800/50">
+                <i class="fa-solid fa-calendar-day text-indigo-400 mr-1.5"></i>一斉テスト実施日: <span id="cbt-res-date-val"></span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-[#1b233a] p-3.5 rounded-2xl border border-slate-800 text-center">
+                    <span class="text-[10px] font-bold text-slate-400 block mb-0.5">正解数</span>
+                    <p class="text-xl font-black text-indigo-400" id="cbt-res-score">0 / 10</p>
+                </div>
+                <div class="bg-[#1b233a] p-3.5 rounded-2xl border border-slate-800 text-center">
+                    <span class="text-[10px] font-bold text-slate-400 block mb-0.5">正解率</span>
+                    <p class="text-xl font-black text-emerald-400" id="cbt-res-accuracy">0 %</p>
+                </div>
+                <div class="bg-[#1b233a] p-3.5 rounded-2xl border border-slate-800 text-center">
+                    <span class="text-[10px] font-bold text-slate-400 block mb-0.5">到達レベル</span>
+                    <p class="text-xl font-black text-purple-400" id="cbt-res-final-lvl">Lv.1</p>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <button id="copy-cbt-result-btn" onclick="copyCBTResult()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold transition text-xs shadow-lg shadow-emerald-950/50 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-copy"></i>
+                    <span>結果をコピー (申告用)</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="openReviewModal()" class="w-full py-3.5 rounded-2xl bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/60 font-bold transition text-xs shadow-lg flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>回答振り返り</span>
+                </button>
+                <button onclick="goToLanding()" class="w-full py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition text-xs shadow-lg">
+                    トップ画面に戻る
+                </button>
+            </div>
+        </section>
+
     </main>
 
-    <!-- History Modal Window -->
-    <div id="modal-history" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="p-4 bg-slate-800 border-b border-slate-700 text-white flex justify-between items-center">
-                <div class="flex items-center space-x-2 font-bold text-base md:text-lg">
-                    <i class="fa-solid fa-clock-rotate-left text-amber-400"></i>
-                    <span>過去の成績（直近10回）</span>
-                </div>
-                <button id="btn-close-history" class="text-slate-400 hover:text-white text-xl font-bold px-2 py-1 rounded-lg">
-                    <i class="fa-solid fa-xmark"></i>
+    <!-- MODALS -->
+    <!-- STATS MODAL (単元別・レベル別正答率/解答時間分析) -->
+    <div id="stats-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 md:p-4 animate-fade-in">
+        <div class="bg-[#0f1423] rounded-3xl max-w-2xl w-full p-4 md:p-6 shadow-2xl border border-slate-800 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800/80 mb-4">
+                <h3 class="text-base font-extrabold text-white flex items-center">
+                    <i class="fa-solid fa-chart-pie text-amber-400 mr-2.5"></i>単元別・レベル別 成績分析
+                </h3>
+                <button onclick="closeStatsModal()" class="text-slate-400 hover:text-slate-200 p-1.5 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <div id="history-list-container" class="p-4 overflow-y-auto space-y-2 flex-grow min-h-[180px]">
-                <!-- History Items rendered by JS -->
+
+            <!-- 全体サマリー -->
+            <div class="grid grid-cols-3 gap-3 mb-4 shrink-0">
+                <div class="bg-[#1b233a] p-3 rounded-2xl border border-slate-800 text-center">
+                    <span class="text-[10px] font-bold text-slate-400 block mb-0.5">総回答数</span>
+                    <p id="stats-total-count" class="text-lg font-black text-indigo-400">0問</p>
+                </div>
+                <div class="bg-[#1b233a] p-3 rounded-2xl border border-slate-800 text-center">
+                    <span class="text-[10px] font-bold text-slate-400 block mb-0.5">全体正答率</span>
+                    <p id="stats-overall-accuracy" class="text-lg font-black text-emerald-400">0%</p>
+                </div>
+                <div class="bg-[#1b233a] p-3 rounded-2xl border border-slate-800 text-center">
+                    <span class="text-[10px] font-bold text-slate-400 block mb-0.5">平均解答時間</span>
+                    <p id="stats-overall-avg-time" class="text-lg font-black text-amber-400">0.0秒</p>
+                </div>
+            </div>
+
+            <!-- 分析テーブル表示エリア -->
+            <div class="overflow-y-auto flex-grow pr-1 space-y-4" id="stats-content-list">
+                <!-- 動的にテーブルが読み込まれます -->
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-800/80 flex justify-between items-center shrink-0">
+                <span class="text-[11px] text-slate-400">演習データからリアルタイム自動算出</span>
+                <button onclick="closeStatsModal()" class="bg-[#5046e5] hover:bg-[#4338ca] text-white text-xs font-bold py-2.5 px-6 rounded-xl transition shadow-lg shadow-indigo-950/60">
+                    閉じる
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="text-center py-3 text-xs text-slate-500">
-        計算テスト自動生成サービス &copy; 2026
+    <!-- REVIEW MODAL -->
+    <div id="review-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 md:p-4 animate-fade-in">
+        <div class="bg-[#0f1423] rounded-3xl max-w-xl w-full p-4 md:p-6 shadow-2xl border border-slate-800 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800/80 mb-4">
+                <h3 class="text-base font-extrabold text-white flex items-center">
+                    <i class="fa-solid fa-list-check text-indigo-400 mr-2.5"></i>回答振り返り (今回のセッション)
+                </h3>
+                <button onclick="closeReviewModal()" class="text-slate-400 hover:text-slate-200 p-1.5 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="overflow-y-auto space-y-4 flex-grow pr-1.5" id="session-review-list"></div>
+            <div class="mt-4 pt-3 border-t border-slate-800/80 flex justify-between items-center shrink-0">
+                <span class="text-xs font-semibold text-slate-400" id="review-count-info">全 0 問の履歴</span>
+                <button onclick="closeReviewModal()" class="bg-[#5046e5] hover:bg-[#4338ca] text-white text-xs font-bold py-2.5 px-6 rounded-xl transition shadow-lg shadow-indigo-950/60">
+                    閉じる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[#141a2e] rounded-3xl max-w-md w-full p-5 shadow-2xl border border-slate-700 max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
+                <h3 class="text-base font-extrabold text-white flex items-center">
+                    <i class="fa-solid fa-clock-rotate-left text-teal-400 mr-2"></i>直近10回の履歴
+                </h3>
+                <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-200 p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+            <div class="overflow-y-auto space-y-2 flex-grow pr-1" id="global-history-list"></div>
+            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center">
+                <button onclick="clearGlobalHistory()" class="text-xs text-rose-400 hover:text-rose-300">
+                    <i class="fa-solid fa-trash mr-1"></i>全消去
+                </button>
+                <button onclick="closeHistoryModal()" class="bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded-xl border border-slate-700">
+                    閉じる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CBT Modal -->
+    <div id="cbt-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[#141a2e] rounded-3xl max-w-sm w-full p-5 shadow-2xl border border-slate-700">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-extrabold text-white flex items-center">
+                    <i class="fa-solid fa-laptop-code text-emerald-400 mr-2"></i>CBT模擬試験の選択
+                </h3>
+                <button onclick="closeCBTModal()" class="text-slate-400 hover:text-slate-200 p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+            <div class="space-y-3 mt-4">
+                <button onclick="startCBTMode('mini')" class="w-full text-left p-3.5 rounded-2xl border border-emerald-500/40 bg-emerald-950/30 hover:bg-emerald-900/40 transition">
+                    <h4 class="font-bold text-white text-xs">ミニテスト (9問 / 12分)</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5">全9単元から重複なしで1問ずつ出題</p>
+                </button>
+
+                <button onclick="toggleSyncDateSection()" class="w-full text-left p-3.5 rounded-2xl border border-indigo-500/50 bg-indigo-950/40 hover:bg-indigo-900/40 transition flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-indigo-200 text-xs flex items-center">
+                            <i class="fa-solid fa-users text-indigo-400 mr-1.5"></i>一斉テストモード (9問 / 12分)
+                        </h4>
+                        <p class="text-[10px] text-indigo-300/80 mt-0.5">指定日付で全9単元から共通問題を出題</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-down text-indigo-400 text-xs"></i>
+                </button>
+
+                <div id="sync-date-container" class="hidden bg-[#0f1423] p-3 rounded-2xl border border-indigo-800/60 space-y-2.5 animate-fade-in">
+                    <label class="block text-[11px] font-bold text-slate-300">実施日付を選択:</label>
+                    <input type="date" id="sync-date-picker" class="w-full bg-[#1b233a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                    <button onclick="startSyncCBTMode()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition">
+                        この日付で一斉テスト開始
+                    </button>
+                </div>
+
+                <button onclick="startCBTMode('full')" class="w-full text-left p-3.5 rounded-2xl border border-slate-700 bg-[#1b233a] hover:bg-[#232c48] transition">
+                    <h4 class="font-bold text-white text-xs">フル模擬試験 (20問 / 20分)</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5">本番さながらの総合テスト（ランダム）</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fallback Text Modal for Clipboard Restricted Environments -->
+    <div id="fallback-copy-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[#141a2e] rounded-3xl max-w-md w-full p-5 shadow-2xl border border-slate-700 space-y-4">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                <h3 class="text-base font-extrabold text-white flex items-center">
+                    <i class="fa-solid fa-copy text-emerald-400 mr-2"></i>結果テキストのコピー
+                </h3>
+                <button onclick="closeFallbackModal()" class="text-slate-400 hover:text-slate-200 p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-300">お使いの環境ではクリップボードAPIへの直接アクセスが制限されています。以下のテキストエリアを選択してコピーしてください。</p>
+            <textarea id="fallback-copy-textarea" readonly class="w-full h-32 bg-[#0f1423] border border-slate-700 rounded-xl p-3 text-xs text-slate-100 focus:outline-none select-all"></textarea>
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeFallbackModal()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-2 px-4 rounded-xl">
+                    閉じる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-[#0b0f19] border-t border-slate-800/80 py-3 text-center text-[11px] text-slate-500">
+        <p>SPI非言語演習 Web App</p>
     </footer>
 
-    <script>
-        /**
-         * Math Quiz Application Controller
-         */
-        class MathQuizApp {
-            constructor() {
-                this.questions = [];
-                this.currentIndex = 0;
-                this.userAnswers = [];
-                this.startTime = null;
-                this.timerInterval = null;
-                this.elapsedSeconds = 0;
-                this.history = []; // History array (Up to 10 entries)
-                
-                // Current input buffer
-                this.inputState = {
-                    num: '',        // For standard numeric & fraction numerator
-                    den: '',        // For fraction denominator
-                    primeList: [],  // Array of primes chosen for Q10
-                    inequality: '', // Selected symbol for Q11, Q12
-                    fracFocus: 'num' // 'num' or 'den'
-                };
-
-                this.initElements();
-                this.setDefaultDate();
-                this.bindEvents();
-            }
-
-            initElements() {
-                this.screenStart = document.getElementById('screen-start');
-                this.screenCategory = document.getElementById('screen-category');
-                this.screenQuiz = document.getElementById('screen-quiz');
-                this.screenResult = document.getElementById('screen-result');
-                
-                this.btnStart = document.getElementById('btn-start');
-                this.btnCategorySelect = document.getElementById('btn-category-select');
-                this.btnBackToStart = document.getElementById('btn-back-to-start');
-                this.btnRestart = document.getElementById('btn-restart');
-                this.btnFreePractice = document.getElementById('btn-free-practice');
-                this.dateSeedInput = document.getElementById('date-seed-input');
-
-                this.btnCopyResult = document.getElementById('btn-copy-result');
-                this.copyBtnText = document.getElementById('copy-btn-text');
-                
-                this.btnHistoryHeader = document.getElementById('btn-history-header');
-                this.modalHistory = document.getElementById('modal-history');
-                this.btnCloseHistory = document.getElementById('btn-close-history');
-                this.historyListContainer = document.getElementById('history-list-container');
-
-                this.headerTimer = document.getElementById('header-timer');
-                this.timerDisplay = document.getElementById('timer-display');
-                
-                this.qBadge = document.getElementById('question-number-badge');
-                this.qCategory = document.getElementById('question-category');
-                this.qLabel = document.getElementById('q-label');
-                this.problemStatement = document.getElementById('problem-statement');
-                
-                this.inputPreviewBox = document.getElementById('input-preview-box');
-                this.inputPreviewText = document.getElementById('input-preview-text');
-
-                this.keypads = {
-                    numeric: document.getElementById('keypad-numeric'),
-                    prime: document.getElementById('keypad-prime'),
-                    inequality: document.getElementById('keypad-inequality'),
-                    fraction: document.getElementById('keypad-fraction')
-                };
-
-                this.resultScore = document.getElementById('result-score');
-                this.resultTime = document.getElementById('result-time');
-                this.resultsDetailList = document.getElementById('results-detail-list');
-            }
-
-            setDefaultDate() {
-                if (this.dateSeedInput) {
-                    const today = new Date().toISOString().split('T')[0];
-                    this.dateSeedInput.value = today;
-                }
-            }
-
-            bindEvents() {
-                this.btnStart.addEventListener('click', () => this.startQuiz(false));
-                this.btnRestart.addEventListener('click', () => {
-                    this.screenResult.classList.add('hidden');
-                    this.screenStart.classList.remove('hidden');
-                });
-                
-                if (this.btnCategorySelect) {
-                    this.btnCategorySelect.addEventListener('click', () => {
-                        this.screenStart.classList.add('hidden');
-                        this.screenCategory.classList.remove('hidden');
-                    });
-                }
-
-                if (this.btnBackToStart) {
-                    this.btnBackToStart.addEventListener('click', () => {
-                        this.screenCategory.classList.add('hidden');
-                        this.screenStart.classList.remove('hidden');
-                    });
-                }
-
-                // Category buttons binding
-                document.querySelectorAll('.category-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const cat = e.currentTarget.getAttribute('data-category');
-                        this.startCategoryPractice(cat);
-                    });
-                });
-                
-                if (this.btnFreePractice) {
-                    this.btnFreePractice.addEventListener('click', () => {
-                        this.startQuiz(true); // フリー練習（日付固定なしで即スタート）
-                    });
-                }
-
-                this.btnCopyResult.addEventListener('click', () => this.copyResultToClipboard());
-                this.btnHistoryHeader.addEventListener('click', () => this.openHistoryModal());
-                this.btnCloseHistory.addEventListener('click', () => this.closeHistoryModal());
-                
-                // Close modal when clicking outside content
-                this.modalHistory.addEventListener('click', (e) => {
-                    if (e.target === this.modalHistory) {
-                        this.closeHistoryModal();
-                    }
-                });
-
-                // Keyboard support
-                window.addEventListener('keydown', (e) => {
-                    if (this.screenQuiz.classList.contains('hidden')) return;
-                    
-                    const q = this.questions[this.currentIndex];
-                    if (q.type === 'numeric' || q.type === 'fraction') {
-                        if (e.key >= '0' && e.key <= '9') {
-                            this.appendNum(e.key);
-                        } else if (e.key === 'Backspace') {
-                            this.clearInput();
-                        } else if (e.key === 'Enter') {
-                            this.submitAnswer();
-                        }
-                    } else if (q.type === 'inequality') {
-                        if (e.key === '<' || e.key === '>' || e.key === '=') {
-                            this.selectInequality(e.key);
-                        }
-                    }
-                });
-            }
-
-            // 擬似乱数生成器（指定した日付文字列から毎回同じ乱数列を作る）
-            createPRNG(seedStr) {
-                let hash = 0;
-                for (let i = 0; i < seedStr.length; i++) {
-                    hash = ((hash << 5) - hash) + seedStr.charCodeAt(i);
-                    hash |= 0;
-                }
-                return function() {
-                    let t = hash += 0x6D2B79F5;
-                    t = Math.imul(t ^ (t >>> 15), t | 1);
-                    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-                    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-                };
-            }
-
-            generateQuestions(isFreePractice = false) {
-                const list = [];
-
-                let seedValue = '';
-                if (!isFreePractice && this.dateSeedInput) {
-                    seedValue = this.dateSeedInput.value.trim();
-                }
-
-                const prng = seedValue ? this.createPRNG(seedValue) : Math.random;
-
-                // 乱数生成ヘルパー
-                const rand = (min, max) => Math.floor(prng() * (max - min + 1)) + min;
-                const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
-
-                // Q1 ~ Q9: 2-3 digit Four Basic Arithmetic Operations
-                const ops = ['+', '-', '×', '÷'];
-                for (let i = 1; i <= 9; i++) {
-                    const op = ops[rand(0, ops.length - 1)];
-                    let a, b, statement, answer;
-
-                    if (op === '+') {
-                        a = rand(15, 99);
-                        b = rand(15, 99);
-                        statement = `${a} + ${b} =`;
-                        answer = (a + b).toString();
-                    } else if (op === '-') {
-                        a = rand(40, 99);
-                        b = rand(10, a - 1);
-                        statement = `${a} - ${b} =`;
-                        answer = (a - b).toString();
-                    } else if (op === '×') {
-                        a = rand(6, 25);
-                        b = rand(6, 15);
-                        statement = `${a} × ${b} =`;
-                        answer = (a * b).toString();
-                    } else { // '÷'
-                        b = rand(2, 16);
-                        const answerVal = rand(4, 25);
-                        a = b * answerVal;
-                        statement = `${a} ÷ ${b} =`;
-                        answer = answerVal.toString();
-                    }
-
-                    list.push({
-                        id: i,
-                        category: '四則演算',
-                        type: 'numeric',
-                        statement: statement,
-                        answer: answer
-                    });
-                }
-
-                // Q10: Prime Factorization (primes: 2, 3, 5, 7, 11, 13)
-                const primes = [2, 3, 5, 7, 11, 13];
-                const count = rand(3, 4);
-                const selectedPrimes = [];
-                let product = 1;
-                for (let k = 0; k < count; k++) {
-                    const p = primes[rand(0, primes.length - 1)];
-                    selectedPrimes.push(p);
-                    product *= p;
-                }
-                selectedPrimes.sort((a, b) => a - b);
-                list.push({
-                    id: 10,
-                    category: '素因数分解',
-                    type: 'prime',
-                    statement: `${product} の素因数分解 =`,
-                    answer: selectedPrimes.join('×'),
-                    answerPrimes: selectedPrimes
-                });
-
-                // Q11, Q12: Fraction Comparison (Difference <= 5%)
-                for (let i = 11; i <= 12; i++) {
-                    let num1, den1, num2, den2, val1, val2, diffRatio;
-                    do {
-                        num1 = rand(15, 99);
-                        den1 = rand(15, 99);
-                        num2 = rand(15, 99);
-                        den2 = rand(15, 99);
-
-                        val1 = num1 / den1;
-                        val2 = num2 / den2;
-                        diffRatio = Math.abs(val1 - val2) / Math.min(val1, val2);
-                    } while (diffRatio > 0.05 || val1 === val2);
-
-                    let correctSym = val1 > val2 ? '>' : '<';
-
-                    list.push({
-                        id: i,
-                        category: '分数の大小比較',
-                        type: 'inequality',
-                        statement: `${num1}/${den1}  [ ? ]  ${num2}/${den2}`,
-                        answer: correctSym
-                    });
-                }
-
-                // Q13, Q14, Q15: Percentage & Proportion
-                const ratioSubTypes = [0, 1, 2];
-                for (let i = 13; i <= 15; i++) {
-                    const subType = ratioSubTypes[i - 13];
-                    const useWari = prng() < 0.5;
-                    let statement = '';
-                    let answer = '';
-
-                    if (subType === 0) {
-                        const base = rand(2, 20) * 50;
-                        const rateVal = rand(1, 9);
-                        const rateStr = useWari ? `${rateVal}割` : `${rateVal * 10}%`;
-                        const multiplier = rateVal / 10;
-                        statement = `${base} の ${rateStr} =`;
-                        answer = Math.round(base * multiplier).toString();
-                    } else if (subType === 1) {
-                        const base = rand(2, 20) * 50;
-                        const rateVal = rand(1, 8);
-                        const rateStr = useWari ? `${rateVal}割引` : `${rateVal * 10}%引`;
-                        const multiplier = (10 - rateVal) / 10;
-                        statement = `${base} の ${rateStr} =`;
-                        answer = Math.round(base * multiplier).toString();
-                    } else {
-                        const targetVal = rand(2, 15) * 30;
-                        const rateVal = rand(2, 8);
-                        const rateStr = useWari ? `${rateVal}割` : `${rateVal * 10}%`;
-                        const base = (targetVal * 10) / rateVal;
-                        statement = `${rateStr} が ${targetVal} になる数 =`;
-                        answer = Math.round(base).toString();
-                    }
-
-                    list.push({
-                        id: i,
-                        category: '割合計算',
-                        type: 'numeric',
-                        statement: statement,
-                        answer: answer
-                    });
-                }
-
-                // Q16: Sum of 6 to 8 numbers
-                const isArithmetic = prng() < 0.5;
-                let q16Statement = '';
-                let q16Ans = 0;
-
-                if (isArithmetic) {
-                    const count = rand(6, 8);
-                    const start = rand(10, 50);
-                    const diff = rand(2, 8);
-                    const seq = [];
-                    for (let k = 0; k < count; k++) {
-                        const val = start + k * diff;
-                        seq.push(val);
-                        q16Ans += val;
-                    }
-                    q16Statement = seq.join('+') + ' =';
-                } else {
-                    const pairsCount = rand(3, 4);
-                    const seq = [];
-                    for (let k = 0; k < pairsCount; k++) {
-                        const v1 = rand(11, 89);
-                        const v2 = 100 - v1;
-                        seq.push(v1, v2);
-                        q16Ans += 100;
-                    }
-                    seq.sort(() => prng() - 0.5);
-                    q16Statement = seq.join('+') + ' =';
-                }
-
-                list.push({
-                    id: 16,
-                    category: '工夫して計算',
-                    type: 'numeric',
-                    statement: q16Statement,
-                    answer: q16Ans.toString()
-                });
-
-                // Q17, Q18: Time & Fraction Conversion (Ensure unreduced fraction)
-                let hoursFracNum, hoursFracDen, minutesVal;
-                const hoursFracDenOptions = [3, 4, 5, 6, 10, 12, 15, 20, 30];
-                do {
-                    hoursFracDen = hoursFracDenOptions[rand(0, hoursFracDenOptions.length - 1)];
-                    hoursFracNum = rand(1, hoursFracDen * 2);
-                    minutesVal = (hoursFracNum / hoursFracDen) * 60;
-                } while (
-                    hoursFracNum % hoursFracDen === 0 ||
-                    !Number.isInteger(minutesVal) ||
-                    gcd(hoursFracNum, hoursFracDen) > 1
-                );
-
-                list.push({
-                    id: 17,
-                    category: '時間の表記',
-                    type: 'numeric',
-                    statement: `${hoursFracNum}/${hoursFracDen} 時間 = ○ 分`,
-                    answer: minutesVal.toString()
-                });
-
-                let rawMins, g, ansNum, ansDen;
-                do {
-                    rawMins = rand(4, 115);
-                    g = gcd(rawMins, 60);
-                    ansNum = rawMins / g;
-                    ansDen = 60 / g;
-                } while (ansDen === 1 || g > 1);
-
-                list.push({
-                    id: 18,
-                    category: '時間の表記',
-                    type: 'fraction',
-                    statement: `${rawMins} 分 = ○ 時間 (分数で入力)`,
-                    answerNum: ansNum.toString(),
-                    answerDen: ansDen.toString()
-                });
-
-                // Q19, Q20: Speed Conversion (Integer results)
-                const kmhMultiplier = rand(1, 10);
-                const kmhSpeed = kmhMultiplier * 18;
-                const secSpeed = kmhSpeed / 3.6;
-                list.push({
-                    id: 19,
-                    category: '単位変換',
-                    type: 'numeric',
-                    statement: `時速 ${kmhSpeed} km = 秒速 ○ m`,
-                    answer: secSpeed.toString()
-                });
-
-                const mminMultiplier = rand(2, 16);
-                const mminSpeed = mminMultiplier * 50;
-                const kmhVal = (mminSpeed * 60) / 1000;
-                list.push({
-                    id: 20,
-                    category: '単位変換',
-                    type: 'numeric',
-                    statement: `分速 ${mminSpeed} m = 時速 ○ km`,
-                    answer: kmhVal.toString()
-                });
-
-                this.questions = list;
-            }
-
-            startQuiz(isFreePractice = false) {
-                this.generateQuestions(isFreePractice);
-                this.beginTestSession();
-            }
-
-            startCategoryPractice(catKey) {
-                this.generateQuestions(true); // フリー練習ベースで生成
-                
-                // 指定された単元の問題だけを抽出して必ず5問にする
-                let filtered = [];
-                if (catKey === 'arithmetic') {
-                    filtered = this.questions.filter(q => q.category === '四則演算');
-                } else if (catKey === 'prime') {
-                    filtered = [];
-                    const primes = [2, 3, 5, 7, 11, 13];
-                    const randP = () => Math.floor(Math.random() * primes.length);
-                    for(let i=1; i<=10; i++) {
-                        const p1 = primes[randP()], p2 = primes[randP()], p3 = primes[randP()];
-                        const arr = [p1, p2, p3].sort((a,b)=>a-b);
-                        const prod = p1 * p2 * p3;
-                        filtered.push({
-                            id: i,
-                            category: '素因数分解',
-                            type: 'prime',
-                            statement: `${prod} の素因数分解 =`,
-                            answer: arr.join('×'),
-                            answerPrimes: arr
-                        });
-                    }
-                } else if (catKey === 'fraction_compare') {
-                    filtered = this.questions.filter(q => q.category === '分数の大小比較');
-                } else if (catKey === 'ratio') {
-                    filtered = this.questions.filter(q => q.category === '割合計算');
-                } else if (catKey === 'time_notation') {
-                    filtered = this.questions.filter(q => q.category === '時間の表記');
-                } else if (catKey === 'speed_unit') {
-                    filtered = this.questions.filter(q => q.category === '単位変換');
-                }
-
-                // 足りない場合は複製またはランダム生成で必ず5問にする
-                while (filtered.length < 5) {
-                    filtered.push({...filtered[0], id: filtered.length + 1});
-                }
-                // ちょうど5問にカット
-                this.questions = filtered.slice(0, 5);
-
-                this.beginTestSession();
-            }
-
-            beginTestSession() {
-                this.currentIndex = 0;
-                this.userAnswers = [];
-                this.elapsedSeconds = 0;
-
-                this.screenStart.classList.add('hidden');
-                this.screenCategory.classList.add('hidden');
-                this.screenResult.classList.add('hidden');
-                this.screenQuiz.classList.remove('hidden');
-                this.screenQuiz.classList.add('flex');
-                this.headerTimer.classList.remove('hidden');
-
-                this.startTimer();
-                this.renderCurrentQuestion();
-            }
-
-            startTimer() {
-                if (this.timerInterval) clearInterval(this.timerInterval);
-                this.timerDisplay.textContent = '00:00.00';
-                this.startTime = Date.now();
-                this.timerInterval = setInterval(() => {
-                    const elapsedMs = Date.now() - this.startTime;
-                    this.elapsedSeconds = Math.floor(elapsedMs / 1000);
-                    const m = String(Math.floor(elapsedMs / 60000)).padStart(2, '0');
-                    const s = String(Math.floor((elapsedMs % 60000) / 1000)).padStart(2, '0');
-                    const cs = String(Math.floor((elapsedMs % 1000) / 10)).padStart(2, '0');
-                    this.timerDisplay.textContent = `${m}:${s}.${cs}`;
-                }, 10);
-            }
-
-            stopTimer() {
-                if (this.timerInterval) clearInterval(this.timerInterval);
-            }
-
-            renderCurrentQuestion() {
-                const q = this.questions[this.currentIndex];
-                const totalQ = this.questions.length;
-                
-                // Update badges
-                this.qBadge.textContent = `問 ${this.currentIndex + 1} / ${totalQ}`;
-                this.qCategory.textContent = q.category;
-                this.qLabel.textContent = `Q${this.currentIndex + 1}`;
-
-                // Render Problem Statement
-                this.problemStatement.textContent = q.statement;
-
-                // Reset Input State
-                this.inputState = {
-                    num: '',
-                    den: '',
-                    primeList: [],
-                    inequality: '',
-                    fracFocus: 'num'
-                };
-
-                // Switch Active Keypad UI
-                Object.values(this.keypads).forEach(el => el.classList.add('hidden'));
-                if (q.type === 'numeric') {
-                    this.keypads.numeric.classList.remove('hidden');
-                } else if (q.type === 'prime') {
-                    this.keypads.prime.classList.remove('hidden');
-                } else if (q.type === 'inequality') {
-                    this.keypads.inequality.classList.remove('hidden');
-                } else if (q.type === 'fraction') {
-                    this.keypads.fraction.classList.remove('hidden');
-                    this.setFractionFocus('num');
-                }
-
-                this.updateInputPreview();
-            }
-
-            appendNum(digit) {
-                const q = this.questions[this.currentIndex];
-                if (q.type === 'fraction') {
-                    if (this.inputState.fracFocus === 'num') {
-                        if (this.inputState.num.length < 5) this.inputState.num += digit;
-                    } else {
-                        if (this.inputState.den.length < 5) this.inputState.den += digit;
-                    }
-                } else {
-                    if (this.inputState.num.length < 8) this.inputState.num += digit;
-                }
-                this.updateInputPreview();
-            }
-
-            appendPrime(p) {
-                if (this.inputState.primeList.length < 8) {
-                    this.inputState.primeList.push(p);
-                }
-                this.updateInputPreview();
-            }
-
-            selectInequality(sym) {
-                this.inputState.inequality = sym;
-                this.updateInputPreview();
-            }
-
-            setFractionFocus(target) {
-                this.inputState.fracFocus = target;
-                const btnBack = document.getElementById('btn-frac-back');
-                const statusText = document.getElementById('frac-status-text');
-                const stepBadge = document.getElementById('frac-step-badge');
-
-                if (target === 'num') {
-                    if (statusText) statusText.textContent = '分子（上の数）を入力';
-                    if (stepBadge) stepBadge.textContent = '1/2';
-                    if (btnBack) btnBack.classList.add('hidden');
-                } else {
-                    if (statusText) statusText.textContent = '分母（下の数）を入力';
-                    if (stepBadge) stepBadge.textContent = '2/2';
-                    if (btnBack) btnBack.classList.remove('hidden');
-                }
-                this.updateInputPreview();
-            }
-
-            clearInput() {
-                const q = this.questions[this.currentIndex];
-                if (q.type === 'prime') {
-                    this.inputState.primeList.pop();
-                } else if (q.type === 'fraction') {
-                    if (this.inputState.fracFocus === 'num') {
-                        this.inputState.num = this.inputState.num.slice(0, -1);
-                    } else {
-                        this.inputState.den = this.inputState.den.slice(0, -1);
-                    }
-                } else {
-                    this.inputState.num = '';
-                    this.inputState.inequality = '';
-                }
-                this.updateInputPreview();
-            }
-
-            updateInputPreview() {
-                const q = this.questions[this.currentIndex];
-                
-                if (q.type === 'numeric') {
-                    if (this.inputState.num === '') {
-                        this.inputPreviewText.className = 'placeholder-text text-slate-500 font-normal text-base';
-                        this.inputPreviewText.textContent = '解答を入力';
-                    } else {
-                        this.inputPreviewText.className = 'text-indigo-300 font-bold text-2xl';
-                        this.inputPreviewText.textContent = this.inputState.num;
-                    }
-                } else if (q.type === 'prime') {
-                    if (this.inputState.primeList.length === 0) {
-                        this.inputPreviewText.className = 'placeholder-text text-slate-500 font-normal text-base';
-                        this.inputPreviewText.textContent = '素数ボタンをタップ';
-                    } else {
-                        this.inputPreviewText.className = 'text-indigo-300 font-bold text-2xl';
-                        this.inputPreviewText.textContent = this.inputState.primeList.join(' × ');
-                    }
-                } else if (q.type === 'inequality') {
-                    if (this.inputState.inequality === '') {
-                        this.inputPreviewText.className = 'placeholder-text text-slate-500 font-normal text-base';
-                        this.inputPreviewText.textContent = '＜ ＞ ＝ を選択';
-                    } else {
-                        this.inputPreviewText.className = 'text-indigo-300 font-extrabold text-3xl';
-                        this.inputPreviewText.textContent = this.inputState.inequality;
-                    }
-                } else if (q.type === 'fraction') {
-                    const isNumFocus = this.inputState.fracFocus === 'num';
-                    const numText = this.inputState.num || '分子';
-                    const denText = this.inputState.den || '分母';
-                    this.inputPreviewText.className = 'text-indigo-300 font-bold text-lg flex items-center justify-center';
-                    
-                    this.inputPreviewText.innerHTML = `
-                        <div class="inline-flex flex-col items-center justify-center px-4 py-1.5 bg-slate-800 rounded-xl border border-slate-700">
-                            <span class="border-b-2 ${isNumFocus ? 'border-indigo-400 text-indigo-300 font-extrabold text-xl' : 'border-slate-600 text-slate-400 font-normal'} transition-all px-3 py-0.5">${numText}</span>
-                            <span class="${!isNumFocus ? 'text-indigo-300 font-extrabold text-xl' : 'text-slate-400 font-normal'} transition-all px-3 py-0.5">${denText}</span>
-                        </div>
-                    `;
-                }
-            }
-
-            submitAnswer() {
-                const q = this.questions[this.currentIndex];
-                let isCorrect = false;
-                let userDisplayAnswer = '';
-
-                if (q.type === 'numeric') {
-                    if (!this.inputState.num) return;
-                    userDisplayAnswer = this.inputState.num;
-                    isCorrect = (userDisplayAnswer.trim() === q.answer.trim());
-                } else if (q.type === 'prime') {
-                    if (this.inputState.primeList.length === 0) return;
-                    userDisplayAnswer = this.inputState.primeList.join('×');
-                    const sortedUserPrimes = [...this.inputState.primeList].sort((a, b) => a - b);
-                    isCorrect = (JSON.stringify(sortedUserPrimes) === JSON.stringify(q.answerPrimes));
-                } else if (q.type === 'inequality') {
-                    if (!this.inputState.inequality) return;
-                    userDisplayAnswer = this.inputState.inequality;
-                    isCorrect = (userDisplayAnswer === q.answer);
-                } else if (q.type === 'fraction') {
-                    if (this.inputState.fracFocus === 'num') {
-                        if (!this.inputState.num) return;
-                        this.setFractionFocus('den');
-                        return;
-                    }
-
-                    if (!this.inputState.num || !this.inputState.den) return;
-                    userDisplayAnswer = `${this.inputState.num}/${this.inputState.den}`;
-                    isCorrect = (this.inputState.num === q.answerNum && this.inputState.den === q.answerDen);
-                }
-
-                this.userAnswers.push({
-                    question: q,
-                    userAnswer: userDisplayAnswer,
-                    isCorrect: isCorrect
-                });
-
-                // Next question or Finish
-                if (this.currentIndex < this.questions.length - 1) {
-                    this.currentIndex++;
-                    this.renderCurrentQuestion();
-                } else {
-                    this.finishQuiz();
-                }
-            }
-
-            finishQuiz() {
-                this.stopTimer();
-                this.screenQuiz.classList.add('hidden');
-                this.screenQuiz.classList.remove('flex');
-                this.screenResult.classList.remove('hidden');
-                this.screenResult.classList.add('flex');
-
-                const totalQ = this.questions.length;
-                const score = this.userAnswers.filter(a => a.isCorrect).length;
-                this.resultScore.textContent = `${score}`;
-                const resultTotalLabel = document.getElementById('result-total-label');
-                if (resultTotalLabel) {
-                    resultTotalLabel.textContent = ` / ${totalQ}`;
-                }
-
-                // Time Format
-                const elapsedMs = Date.now() - this.startTime;
-                const m = String(Math.floor(elapsedMs / 60000)).padStart(2, '0');
-                const s = String(Math.floor((elapsedMs % 60000) / 1000)).padStart(2, '0');
-                const cs = String(Math.floor((elapsedMs % 1000) / 10)).padStart(2, '0');
-                
-                this.resultTime.textContent = `${m}:${s}.${cs}`;
-                const timeStr = `${m}:${s}`;
-
-                this.copyBtnText.textContent = '結果をコピーする（報告・記録用）';
-
-                // Save to history list
-                const now = new Date();
-                const dateStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                
-                this.history.unshift({
-                    score: `${score}/${totalQ}`,
-                    timeStr: timeStr,
-                    dateStr: dateStr
-                });
-                if (this.history.length > 10) {
-                    this.history.pop();
-                }
-
-                // Render Details
-                this.resultsDetailList.innerHTML = '';
-                this.userAnswers.forEach((ans, idx) => {
-                    const q = ans.question;
-                    let correctDisplay = q.answer;
-                    if (q.type === 'fraction') {
-                        correctDisplay = `${q.answerNum}/${q.answerDen}`;
-                    }
-
-                    const item = document.createElement('div');
-                    item.className = `p-3 rounded-xl border flex items-start justify-between ${
-                        ans.isCorrect ? 'bg-emerald-950/50 border-emerald-800/80' : 'bg-rose-950/50 border-rose-800/80'
-                    }`;
-
-                    item.innerHTML = `
-                        <div class="space-y-0.5">
-                            <div class="font-bold text-slate-200 text-xs">問${idx + 1}. ${q.statement}</div>
-                            <div class="text-xs ${ans.isCorrect ? 'text-emerald-400' : 'text-rose-400'}">
-                                あなたの解答: <span class="font-bold">${ans.userAnswer}</span>
-                            </div>
-                            ${!ans.isCorrect ? `<div class="text-xs text-slate-400">正解: <span class="font-bold text-indigo-300">${correctDisplay}</span></div>` : ''}
-                        </div>
-                        <div class="text-lg font-bold ${ans.isCorrect ? 'text-emerald-400' : 'text-rose-400'}">
-                            ${ans.isCorrect ? '<i class="fa-regular fa-circle-check"></i>' : '<i class="fa-regular fa-circle-xmark"></i>'}
-                        </div>
-                    `;
-                    this.resultsDetailList.appendChild(item);
-                });
-            }
-
-            copyResultToClipboard() {
-                const score = this.resultScore.textContent;
-                const timeStr = this.resultTime.textContent;
-                const shareText = `【計算テスト結果】\n得点: ${score}点\nクリアタイム: ${timeStr}`;
-
-                const textArea = document.createElement('textarea');
-                textArea.value = shareText;
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    this.copyBtnText.textContent = '✓ コピーしました！';
-                    setTimeout(() => {
-                        this.copyBtnText.textContent = '結果をコピーする（報告・記録用）';
-                    }, 3000);
-                } catch (err) {
-                    console.error('Copy failed:', err);
-                }
-                document.body.removeChild(textArea);
-            }
-
-            openHistoryModal() {
-                this.renderHistoryList();
-                this.modalHistory.classList.remove('hidden');
-            }
-
-            closeHistoryModal() {
-                this.modalHistory.classList.add('hidden');
-            }
-
-            renderHistoryList() {
-                this.historyListContainer.innerHTML = '';
-
-                if (this.history.length === 0) {
-                    this.historyListContainer.innerHTML = `
-                        <div class="text-center py-8 text-slate-500 text-sm">
-                            <i class="fa-solid fa-clipboard-list text-3xl mb-2 text-slate-600 block"></i>
-                            まだテストの挑戦履歴がありません。
-                        </div>
-                    `;
-                    return;
-                }
-
-                this.history.forEach((item, index) => {
-                    const row = document.createElement('div');
-                    row.className = "p-3 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-between text-sm";
-                    row.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <span class="text-xs font-bold bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded-md border border-indigo-900">第 ${this.history.length - index} 回</span>
-                            <span class="text-xs text-slate-400 font-medium">${item.dateStr}</span>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <span class="font-extrabold text-indigo-300">${item.score} <span class="text-xs text-slate-400 font-normal">点</span></span>
-                            <span class="font-mono text-slate-300 font-bold text-xs"><i class="fa-regular fa-clock mr-1 text-slate-400"></i>${item.timeStr}</span>
-                        </div>
-                    `;
-                    this.historyListContainer.appendChild(row);
-                });
-            }
-        }
-
-        let app;
-        window.onload = function() {
-            app = new MathQuizApp();
-        };
-    </script>
+    <!-- SCRIPT LOGIC (分割済み: js/algorithms/ に単元別の作問アルゴリズム、js/ui.js に画面制御ロジック) -->
+    <!-- common.js は他の単元別ファイルが依存するため、必ず最初に読み込むこと -->
+    <script src="js/algorithms/common.js"></script>
+    <script src="js/algorithms/set.js"></script>
+    <script src="js/algorithms/settlement.js"></script>
+    <script src="js/algorithms/discount.js"></script>
+    <script src="js/algorithms/installment.js"></script>
+    <script src="js/algorithms/speed.js"></script>
+    <script src="js/algorithms/timetable.js"></script>
+    <script src="js/algorithms/profit.js"></script>
+    <script src="js/algorithms/probability.js"></script>
+    <script src="js/algorithms/logical.js"></script>
+    <script src="js/algorithms/inference.js"></script>
+    <script src="js/algorithms/table.js"></script>
+    <script src="js/ui.js"></script>
 </body>
 </html>
