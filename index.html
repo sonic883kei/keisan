@@ -383,6 +383,7 @@
                 this.timerInterval = null;
                 this.elapsedSeconds = 0;
                 this.history = []; // History array (Up to 10 entries)
+                this.isCategoryMode = false; // 単元別トレーニングモードフラグ
                 
                 // Current input buffer
                 this.inputState = {
@@ -786,11 +787,13 @@
             }
 
             startQuiz(isFreePractice = false) {
+                this.isCategoryMode = false;
                 this.generateQuestions(isFreePractice);
                 this.beginTestSession();
             }
 
             startCategoryPractice(catKey) {
+                this.isCategoryMode = true;
                 this.generateQuestions(true); // フリー練習ベースで生成
                 
                 // 指定された単元の問題だけを抽出して必ず5問にする
@@ -845,6 +848,13 @@
                 this.screenQuiz.classList.remove('hidden');
                 this.screenQuiz.classList.add('flex');
                 this.headerTimer.classList.remove('hidden');
+
+                // 単元別練習モードの時のみ「トップに戻る」ボタンを表示
+                if (this.isCategoryMode) {
+                    this.btnQuizHome.classList.remove('hidden');
+                } else {
+                    this.btnQuizHome.classList.add('hidden');
+                }
 
                 this.startTimer();
                 this.renderCurrentQuestion();
