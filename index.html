@@ -172,18 +172,26 @@
                     </button>
                 </div>
 
-                <button id="btn-back-to-start" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm rounded-xl border border-slate-700 transition-all">
-                    <i class="fa-solid fa-arrow-left mr-2"></i>メニューに戻る
+                <button id="btn-back-to-start" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm rounded-xl border border-slate-700 transition-all flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-house"></i>
+                    <span>トップページに戻る</span>
                 </button>
             </div>
 
             <!-- Quiz Screen -->
             <div id="screen-quiz" class="hidden flex-col justify-between h-full p-4 md:p-6">
-                <!-- Top Badge Header (Progress Bar Removed) -->
+                <!-- Top Badge Header -->
                 <div>
                     <div class="flex justify-between items-center text-sm font-semibold text-slate-400 mb-2">
                         <span id="question-number-badge" class="bg-indigo-950 text-indigo-300 border border-indigo-800/60 px-3.5 py-1.5 rounded-full text-xs font-bold">問 1 / 20</span>
-                        <span id="question-category" class="text-slate-400 text-xs">四則演算</span>
+                        
+                        <div class="flex items-center space-x-3">
+                            <span id="question-category" class="text-slate-400 text-xs hidden sm:inline">四則演算</span>
+                            <button id="btn-quiz-home" class="bg-slate-800 hover:bg-rose-900/60 hover:text-rose-200 active:bg-rose-900 text-slate-300 px-3 py-1 rounded-full text-xs font-bold transition-all border border-slate-700 flex items-center space-x-1">
+                                <i class="fa-solid fa-house text-amber-400"></i>
+                                <span>トップに戻る</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -199,7 +207,7 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Keypads (Enlarged with wider gaps) -->
+                <!-- Dynamic Keypads -->
                 <div id="keypad-container" class="w-full">
                     
                     <!-- 1. Numeric Keypad (Standard) -->
@@ -220,7 +228,7 @@
                         </button>
                     </div>
 
-                    <!-- 2. Prime Factors Keypad (Q10) -->
+                    <!-- 2. Prime Factors Keypad -->
                     <div id="keypad-prime" class="hidden max-w-sm mx-auto space-y-3">
                         <div class="grid grid-cols-3 gap-3">
                             <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-2xl py-4.5 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.appendPrime(2)">2</button>
@@ -239,7 +247,7 @@
                         </div>
                     </div>
 
-                    <!-- 3. Inequality Keypad (Q11, Q12) -->
+                    <!-- 3. Inequality Keypad -->
                     <div id="keypad-inequality" class="hidden max-w-xs mx-auto space-y-3">
                         <div class="grid grid-cols-3 gap-3">
                             <button class="key-btn bg-indigo-950/70 hover:bg-indigo-900 text-indigo-200 font-extrabold text-3xl py-6 rounded-xl border border-indigo-800/80 shadow-sm" onclick="app.selectInequality('<')">&lt;</button>
@@ -252,9 +260,8 @@
                         </button>
                     </div>
 
-                    <!-- 4. Fraction Input Keypad (Q17, Q18) -->
+                    <!-- 4. Fraction Input Keypad -->
                     <div id="keypad-fraction" class="hidden max-w-xs mx-auto space-y-3">
-                        <!-- Fraction Step Header / Back Button -->
                         <div class="flex items-center justify-between bg-slate-800 p-3 rounded-xl text-xs font-bold text-slate-300 border border-slate-700">
                             <div class="flex items-center space-x-2">
                                 <span id="frac-step-badge" class="bg-indigo-600 text-white px-2 py-0.5 rounded-md font-mono font-bold">1/2</span>
@@ -266,7 +273,6 @@
                             </button>
                         </div>
                         
-                        <!-- Mini Numpad for Fractions -->
                         <div class="grid grid-cols-3 gap-3">
                             <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('7')">7</button>
                             <button class="key-btn bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xl py-3 rounded-xl border border-slate-700 shadow-sm" onclick="app.appendNum('8')">8</button>
@@ -401,6 +407,7 @@
                 this.btnStart = document.getElementById('btn-start');
                 this.btnCategorySelect = document.getElementById('btn-category-select');
                 this.btnBackToStart = document.getElementById('btn-back-to-start');
+                this.btnQuizHome = document.getElementById('btn-quiz-home');
                 this.btnRestart = document.getElementById('btn-restart');
                 this.btnFreePractice = document.getElementById('btn-free-practice');
                 this.dateSeedInput = document.getElementById('date-seed-input');
@@ -459,8 +466,13 @@
 
                 if (this.btnBackToStart) {
                     this.btnBackToStart.addEventListener('click', () => {
-                        this.screenCategory.classList.add('hidden');
-                        this.screenStart.classList.remove('hidden');
+                        this.returnToHome();
+                    });
+                }
+
+                if (this.btnQuizHome) {
+                    this.btnQuizHome.addEventListener('click', () => {
+                        this.returnToHome();
                     });
                 }
 
@@ -508,6 +520,16 @@
                         }
                     }
                 });
+            }
+
+            returnToHome() {
+                this.stopTimer();
+                this.headerTimer.classList.add('hidden');
+                this.screenCategory.classList.add('hidden');
+                this.screenQuiz.classList.add('hidden');
+                this.screenQuiz.classList.remove('flex');
+                this.screenResult.classList.add('hidden');
+                this.screenStart.classList.remove('hidden');
             }
 
             // 擬似乱数生成器（指定した日付文字列から毎回同じ乱数列を作る）
